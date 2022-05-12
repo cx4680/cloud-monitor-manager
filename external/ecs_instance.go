@@ -13,43 +13,62 @@ type EcsInstanceService struct {
 	service.InstanceServiceImpl
 }
 
-type EcsQueryPageForm struct {
-	TenantId     string `json:"tenantId"`
-	Current      int    `json:"current"`
-	PageSize     int    `json:"pageSize"`
-	InstanceName string `json:"instanceName"`
-	InstanceId   string `json:"instanceId"`
-	Status       int    `json:"status"`
-	StatusList   []int  `json:"statusList"`
+type EcsQuery struct {
+	CloudProductCode string   `json:"cloudProductCode"`
+	ResourceTypeCode string   `json:"resourceTypeCode"`
+	StatusList       []string `json:"statusList"`
+	RegionCode       string   `json:"regionCode"`
+	Name             string   `json:"name"`
+	TenantId         string   `json:"tenantId"`
+	PageSize         string   `json:"pageSize"`
+	CurrPage         string   `json:"currPage"`
 }
 
-type EcsQueryPageVO struct {
-	Code    string    `json:"code"`
-	Message string    `json:"message"`
-	Data    EcsPageVO `json:"data"`
+type EcsResponse struct {
+	Code    string  `json:"code"`
+	Msg     string  `json:"msg"`
+	TraceId string  `json:"traceId"`
+	Data    EcsPage `json:"data"`
 }
 
-type EcsPageVO struct {
-	Total int      `json:"total"`
-	Rows  []*ECSVO `json:"rows"`
+type EcsPage struct {
+	Total int        `json:"total"`
+	List  []*EcsList `json:"list"`
 }
 
-type ECSVO struct {
-	InstanceId   string `json:"instanceId"`
-	InstanceName string `json:"instanceName"`
-	Region       string `json:"region"`
-	Ip           string `json:"ip"`
-	Status       int    `json:"status"`
-	OsType       string `json:"osType"`
+type EcsList struct {
+	Id               int    `json:"id"`
+	UuidStr          string `json:"uuidStr"`
+	RegionCode       string `json:"regionCode"`
+	RegionName       string `json:"regionName"`
+	ResourceTypeCode string `json:"resourceTypeCode"`
+	CloudProductCode string `json:"cloudProductCode"`
+	TenantId         string `json:"tenantId"`
+	TenantName       string `json:"tenantName"`
+	ResourceId       string `json:"resourceId"`
+	ResourceName     string `json:"resourceName"`
+	OrderId          string `json:"orderId"`
+	ResourceUrl      string `json:"resourceUrl"`
+	AvailabilityZone string `json:"availabilityZone"`
+	Status           int    `json:"status"`
+	StatusDesc       string `json:"statusDesc"`
+	Deleted          int    `json:"deleted"`
+	CreateTime       string `json:"createTime"`
+	UpdateTime       string `json:"updateTime"`
+	Additional       string `json:"additional"`
+	ResCreateTime    string `json:"resCreateTime"`
+	ResUpdateTime    string `json:"resUpdateTime"`
+	Creator          string `json:"creator"`
+	Modifier         string `json:"modifier"`
 }
 
 func (ecs *EcsInstanceService) ConvertRealForm(f service.InstancePageForm) interface{} {
-	param := EcsQueryPageForm{
-		TenantId:     f.TenantId,
-		Current:      f.Current,
-		PageSize:     f.PageSize,
-		InstanceName: f.InstanceName,
-		InstanceId:   f.InstanceId,
+	param := EcsQuery{
+		TenantId:         f.TenantId,
+		CurrPage:         strconv.Itoa(f.Current),
+		PageSize:         strconv.Itoa(f.PageSize),
+		Name:             f.InstanceName,
+		ResourceTypeCode: f.InstanceId,
 	}
 	if strutil.IsNotBlank(f.StatusList) {
 		param.StatusList = toIntList(f.StatusList)
@@ -62,40 +81,34 @@ func (ecs *EcsInstanceService) DoRequest(url string, f interface{}) (interface{}
 	if err != nil {
 		return nil, err
 	}
-	var resp EcsQueryPageVO
+	var resp EcsQuery
 	jsonutil.ToObject(respStr, &resp)
 	return resp, nil
 }
 
 func (ecs *EcsInstanceService) ConvertResp(realResp interface{}) (int, []service.InstanceCommonVO) {
-	vo := realResp.(EcsQueryPageVO)
+	response := realResp.(EcsResponse)
 	var list []service.InstanceCommonVO
-	if vo.Data.Total > 0 {
-		for _, d := range vo.Data.Rows {
+	if response.Data.Total > 0 {
+		for _, d := range response.Data.List {
 			list = append(list, service.InstanceCommonVO{
-				InstanceId:   d.InstanceId,
-				InstanceName: d.InstanceName,
+				InstanceId:   d.ResourceId,
+				InstanceName: d.ResourceName,
 				Labels: []service.InstanceLabel{{
 					Name:  "status",
 					Value: strconv.Itoa(d.Status),
-				}, {
-					Name:  "osType",
-					Value: d.OsType,
 				}},
 			})
 		}
 	}
-	return vo.Data.Total, list
+	return response.Data.Total, list
 }
 
-func toIntList(s string) []int {
+func toIntList(s string) []string {
 	statusList := strings.Split(s, ",")
-	var list []int
+	var list []string
 	for _, v := range statusList {
-		i, err := strconv.Atoi(v)
-		if err == nil {
-			list = append(list, i)
-		}
+		list = append(list, v)
 	}
 	return list
 }

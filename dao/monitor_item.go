@@ -2,6 +2,7 @@ package dao
 
 import (
 	"bytes"
+	"code.cestc.cn/ccos-ops/cloud-monitor-manager/form"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/global"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/global/sys_component/sys_redis"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/logger"
@@ -38,31 +39,35 @@ func (d *MonitorItemDao) GetMonitorItem(productBizId, osType, display string) []
 	return newMonitorItemList
 }
 
-func (d *MonitorItemDao) GetMonitorItemCacheByMetricCode(name string) model.MonitorItem {
-	value, err := sys_redis.Get(name)
+func (d *MonitorItemDao) GetMonitorItemCacheByMetricCode(metricCode string) form.MonitorItem {
+	value, err := sys_redis.Get(metricCode)
 	if err != nil {
-		logger.Logger().Info("key=" + name + ", error:" + err.Error())
+		logger.Logger().Info("key=" + metricCode + ", error:" + err.Error())
 	}
-	var monitorItemModel = model.MonitorItem{}
+	var monitorItemModel = form.MonitorItem{}
 	if strutil.IsNotBlank(value) {
 		jsonutil.ToObject(value, &monitorItemModel)
 		return monitorItemModel
 	}
-	monitorItemModel = d.GetMonitorItemByMetricCode(name)
-	if monitorItemModel == (model.MonitorItem{}) {
+	monitorItemModel = d.GetMonitorItemByMetricCode(metricCode)
+	if monitorItemModel == (form.MonitorItem{}) {
 		logger.Logger().Info("获取监控项为空")
 		return monitorItemModel
 	}
-	if e := sys_redis.SetByTimeOut(name, jsonutil.ToString(monitorItemModel), time.Hour); e != nil {
-		logger.Logger().Error("设置监控项缓存错误, key=" + name)
+	if e := sys_redis.SetByTimeOut(metricCode, jsonutil.ToString(monitorItemModel), time.Hour); e != nil {
+		logger.Logger().Error("设置监控项缓存错误, key=" + metricCode)
 	}
 	return monitorItemModel
 }
 
-func (d *MonitorItemDao) GetMonitorItemByMetricCode(name string) model.MonitorItem {
-	var monitorItemModel = model.MonitorItem{}
-	global.DB.Where("metric_name = ?", name).First(&monitorItemModel)
-	return monitorItemModel
+func (d *MonitorItemDao) GetMonitorItemByMetricCode(metricCode string) form.MonitorItem {
+	var monitorItem = form.MonitorItem{}
+	global.DB.Raw(SelectMonitorItem, metricCode).Find(&monitorItem)
+	if monitorItem == (form.MonitorItem{}) {
+		logger.Logger().Info("获取监控项为空")
+		return monitorItem
+	}
+	return monitorItem
 }
 
 func isShow(exp string, os string) bool {
@@ -80,3 +85,5 @@ func isShow(exp string, os string) bool {
 	}
 	return isShowBool
 }
+
+var SelectMonitorItem = "SELECT mi.metric_name AS metric_name, mi.metrics_linux AS metric_linux, mi.labels AS labels, mp.abbreviation AS product_abbreviation FROM t_monitor_item AS mi LEFT JOIN t_monitor_product mp ON mi.product_biz_id = mp.biz_id WHERE mi.metric_name = ?;"
