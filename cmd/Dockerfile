@@ -17,7 +17,6 @@ FROM  harbor.ceclouddyn.com/baseos/centos:8.4.2105-0.0.1
 WORKDIR /dist
 COPY --from=builder /build/app .
 COPY --from=builder /build/cmd/migrations/*.sql ./migrations/
-COPY --from=builder /build/cmd/templates/*.tpl ./templates/
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime &&\
     echo 'Asia/Shanghai' >/etc/timezone  \
@@ -26,4 +25,4 @@ RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime &&\
 EXPOSE 80
 
 # 启动容器时运行的命令
-ENTRYPOINT ["/bin/sh", "-c", "./app -config /conf/center.yaml"]
+ENTRYPOINT ["/bin/sh", "-c", "./app -config /conf/config.yaml"]
