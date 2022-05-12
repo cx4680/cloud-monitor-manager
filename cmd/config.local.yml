@@ -1,0 +1,25 @@
+app: cloud-monitor
+serve:
+  port: 8080
+  debug: true
+#  read_timeout:
+#  write_timeout:
+db:
+  url: (127.0.0.1:3306)/hawkeye_region?charset=utf8mb4&parseTime=True&loc=Local
+  dialect: mysql
+  max_idle_connes: 10
+  max_open_connes: 100
+  username: root
+
+logger:
+  data_log_prefix: /logs/
+  service_name: cloud-monitor
+  max_size:
+  max_backups:
+  max_age:
+  compress:
+
+prometheus:
+  url: http://10.253.4.74:31714/api/v1
+  query: /query?query=
+  queryRange: /query_range?query=
