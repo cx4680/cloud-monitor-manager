@@ -10,14 +10,14 @@ import (
 	"net/http"
 )
 
-type InstanceRegionCtl struct {
+type InstanceCtl struct {
 }
 
-func NewInstanceRegionCtl() *InstanceRegionCtl {
-	return &InstanceRegionCtl{}
+func NewInstanceCtl() *InstanceCtl {
+	return &InstanceCtl{}
 }
 
-func (ctl *InstanceRegionCtl) GetPage(c *gin.Context) {
+func (ctl *InstanceCtl) GetPage(c *gin.Context) {
 	f := service.InstancePageForm{}
 	if err := c.ShouldBindQuery(&f); err != nil {
 		c.JSON(http.StatusBadRequest, global.NewError(translate.GetErrorMsg(err)))

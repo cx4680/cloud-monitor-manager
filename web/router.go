@@ -40,7 +40,7 @@ func MonitorReportForm() {
 }
 
 func instance() {
-	instanceCtl := controller.NewInstanceRegionCtl()
+	instanceCtl := controller.NewInstanceCtl()
 	group := Router.Group(pathPrefix + "instance/")
 	{
 		group.GET("/page", instanceCtl.GetPage)
