@@ -1,7 +1,7 @@
 package run_time
 
 import (
-	"code.cestc.cn/ccos-ops/cloud-monitor/common/logger"
+	"code.cestc.cn/ccos-ops/cloud-monitor-manager/logger"
 )
 
 func SafeRun(fn func()) {
