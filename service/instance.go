@@ -21,14 +21,15 @@ type InstanceCommonVO struct {
 }
 
 type InstancePageForm struct {
-	TenantId     string            `form:"tenantId"`
-	InstanceId   string            `form:"instanceId"`
-	InstanceName string            `form:"instanceName"`
-	StatusList   string            `form:"statusList"`
-	Current      int               `form:"current,default=1"`
-	PageSize     int               `form:"pageSize,default=10"`
-	Product      string            `form:"product" binding:"required"`
-	ExtraAttr    map[string]string `form:"extraAttr"`
+	ProductCode  string `form:"productCode"`
+	InstanceId   string `form:"instanceId"`
+	InstanceName string `form:"instanceName"`
+	RegionCode   string `form:"regionCode"`
+	TenantId     string `form:"tenantId"`
+	StatusList   string `form:"statusList"`
+	Current      int    `form:"current,default=1"`
+	PageSize     int    `form:"pageSize,default=10"`
+	Product      string `form:"product"`
 }
 
 type InstanceStage interface {

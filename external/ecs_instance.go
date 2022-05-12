@@ -4,7 +4,6 @@ import (
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/service"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/util/httputil"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/util/jsonutil"
-	"code.cestc.cn/ccos-ops/cloud-monitor-manager/util/strutil"
 	"strconv"
 	"strings"
 )
@@ -13,9 +12,10 @@ type EcsInstanceService struct {
 	service.InstanceServiceImpl
 }
 
-type EcsQuery struct {
+type EcsRequest struct {
 	CloudProductCode string   `json:"cloudProductCode"`
 	ResourceTypeCode string   `json:"resourceTypeCode"`
+	ResourceId       string   `json:"resourceId"`
 	StatusList       []string `json:"statusList"`
 	RegionCode       string   `json:"regionCode"`
 	Name             string   `json:"name"`
@@ -63,15 +63,16 @@ type EcsList struct {
 }
 
 func (ecs *EcsInstanceService) ConvertRealForm(f service.InstancePageForm) interface{} {
-	param := EcsQuery{
+	param := EcsRequest{
+		CloudProductCode: f.ProductCode,
+		ResourceTypeCode: "instance",
+		ResourceId:       f.InstanceId,
+		Name:             f.InstanceName,
+		RegionCode:       f.RegionCode,
 		TenantId:         f.TenantId,
+		StatusList:       toStringList(f.StatusList),
 		CurrPage:         strconv.Itoa(f.Current),
 		PageSize:         strconv.Itoa(f.PageSize),
-		Name:             f.InstanceName,
-		ResourceTypeCode: f.InstanceId,
-	}
-	if strutil.IsNotBlank(f.StatusList) {
-		param.StatusList = toIntList(f.StatusList)
 	}
 	return param
 }
@@ -81,7 +82,7 @@ func (ecs *EcsInstanceService) DoRequest(url string, f interface{}) (interface{}
 	if err != nil {
 		return nil, err
 	}
-	var resp EcsQuery
+	var resp EcsRequest
 	jsonutil.ToObject(respStr, &resp)
 	return resp, nil
 }
@@ -104,7 +105,7 @@ func (ecs *EcsInstanceService) ConvertResp(realResp interface{}) (int, []service
 	return response.Data.Total, list
 }
 
-func toIntList(s string) []string {
+func toStringList(s string) []string {
 	statusList := strings.Split(s, ",")
 	var list []string
 	for _, v := range statusList {
