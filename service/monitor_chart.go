@@ -26,10 +26,10 @@ func (s *MonitorChartService) GetData(request form.PrometheusRequest) (*form.Pro
 		return nil, errors.NewBusinessError("instance为空")
 	}
 	monitorItem := dao.MonitorItem.GetMonitorItemCacheByMetricCode(request.Name)
-	if strutil.IsBlank(monitorItem.MetricsLinux) {
+	if strutil.IsBlank(monitorItem.Code) {
 		return nil, errors.NewBusinessError("指标不存在")
 	}
-	pql := strings.ReplaceAll(monitorItem.MetricsLinux, constant.MetricLabel, constant.INSTANCE+"='"+request.Instance+"',"+constant.FILTER)
+	pql := strings.ReplaceAll(monitorItem.Expression, constant.MetricLabel, constant.INSTANCE+"='"+request.Instance+"',"+constant.FILTER)
 	prometheusResponse := s.prometheus.Query(pql, request.Time)
 	if len(prometheusResponse.Data.Result) == 0 {
 		return nil, nil
@@ -47,7 +47,7 @@ func (s *MonitorChartService) GetAxisData(request form.PrometheusRequest) (*form
 		return nil, errors.NewBusinessError("instance为空")
 	}
 	monitorItem := dao.MonitorItem.GetMonitorItemCacheByMetricCode(request.Name)
-	pql := strings.ReplaceAll(monitorItem.MetricsLinux, constant.MetricLabel, constant.INSTANCE+"='"+request.Instance+"',"+constant.FILTER)
+	pql := strings.ReplaceAll(monitorItem.Expression, constant.MetricLabel, constant.INSTANCE+"='"+request.Instance+"',"+constant.FILTER)
 	prometheusResponse := s.prometheus.QueryRange(pql, strconv.Itoa(request.Start), strconv.Itoa(request.End), strconv.Itoa(request.Step))
 	result := prometheusResponse.Data.Result
 	labels := strings.Split(monitorItem.Labels, ",")

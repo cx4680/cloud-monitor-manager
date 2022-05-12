@@ -2,9 +2,6 @@ package web
 
 import (
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/api/openapi/v1.0"
-	"code.cestc.cn/ccos-ops/cloud-monitor/pkg/business-common/global/iam"
-	"code.cestc.cn/ccos-ops/cloud-monitor/pkg/business-common/global/logs"
-	"code.cestc.cn/yyptb-group_tech/iam-sdk-go/pkg/models"
 	"github.com/gin-gonic/gin"
 )
 
@@ -32,9 +29,7 @@ func MonitorReportOpenApiV1Routers(group *gin.RouterGroup) {
 	group.GET("metrics/:MetricCode/:N/resources", monitorReportFormCtl.GetMonitorDataTop)
 }
 
-func instanceOpenApiRouters(group *gin.RouterGroup) {
-	ctl := v1_0.NewInstanceCtl()
-	group.GET("resources/:ResourceId/rules", logs.GinTrailzap(false, Read, logs.INFO, logs.Resource), iam.AuthIdentify(&models.Identity{Product: iam.ProductMonitor, Action: "GetInstanceRulePageList", ResourceType: "*", ResourceId: "*"}), ctl.Page)
-	group.DELETE("resources/:ResourceId/rules", logs.GinTrailzap(false, Write, logs.Warn, logs.Resource), iam.AuthIdentify(&models.Identity{Product: iam.ProductMonitor, Action: "UnbindInstanceRule", ResourceType: "*", ResourceId: "*"}), ctl.Unbind)
-	group.PUT("resources/:ResourceId/rules", logs.GinTrailzap(false, Write, logs.Warn, logs.Resource), iam.AuthIdentify(&models.Identity{Product: iam.ProductMonitor, Action: "BindInstanceRule", ResourceType: "*", ResourceId: "*"}), ctl.Bind)
+func ResourceOpenApiV1Routers(group *gin.RouterGroup) {
+	resourceCtl := v1_0.NewResourceController()
+	group.GET(":ProductAbbreviation/resources", resourceCtl.GetResourceList)
 }
