@@ -15,6 +15,7 @@ type EcsInstanceService struct {
 type EcsRequest struct {
 	CloudProductCode string   `json:"cloudProductCode"`
 	ResourceTypeCode string   `json:"resourceTypeCode"`
+	ResourceId       string   `json:"resourceId"`
 	StatusList       []string `json:"statusList"`
 	RegionCode       string   `json:"regionCode"`
 	Name             string   `json:"name"`
@@ -65,6 +66,7 @@ func (ecs *EcsInstanceService) ConvertRealForm(f service.InstancePageForm) inter
 	param := EcsRequest{
 		CloudProductCode: f.ProductCode,
 		ResourceTypeCode: "instance",
+		ResourceId:       f.InstanceId,
 		Name:             f.InstanceName,
 		RegionCode:       f.RegionCode,
 		TenantId:         f.TenantId,
