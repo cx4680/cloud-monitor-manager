@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-const pathPrefix = "/hawkeye/"
+const pathPrefix = "/cmm/"
 
 func loadRouters() {
 	actuatorMapping()
