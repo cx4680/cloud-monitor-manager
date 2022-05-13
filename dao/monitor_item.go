@@ -40,7 +40,7 @@ func (d *MonitorItemDao) GetMonitorItem(productBizId, osType, display string) []
 }
 
 func (d *MonitorItemDao) GetMonitorItemCacheByMetricCode(metricCode string) form.MonitorItem {
-	value, err := sys_redis.Get(metricCode)
+	value, err := sys_redis.Get("cloudMonitorManager-" + metricCode)
 	if err != nil {
 		logger.Logger().Info("key=" + metricCode + ", error:" + err.Error())
 	}
