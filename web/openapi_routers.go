@@ -24,10 +24,10 @@ func monitorItemOpenApiV1Routers(group *gin.RouterGroup) {
 }
 
 func MonitorReportOpenApiV1Routers(group *gin.RouterGroup) {
-	monitorReportFormCtl := v1_0.NewMonitorReportFormController()
-	group.GET("resources/:ResourceId/metrics/:MetricCode/datas", monitorReportFormCtl.GetMonitorDatas)
-	group.GET("resources/:ResourceId/metrics/:MetricCode/data", monitorReportFormCtl.GetMonitorData)
-	group.GET("metrics/:MetricCode/:N/resources", monitorReportFormCtl.GetMonitorDataTop)
+	monitorChartCtl := v1_0.NewMonitorChartController()
+	group.GET("resources/:ResourceId/metrics/:MetricCode/datas", monitorChartCtl.GetMonitorDatas)
+	group.GET("resources/:ResourceId/metrics/:MetricCode/data", monitorChartCtl.GetMonitorData)
+	group.GET("metrics/:MetricCode/:N/resources", monitorChartCtl.GetMonitorDataTop)
 }
 
 func ResourceOpenApiV1Routers(group *gin.RouterGroup) {

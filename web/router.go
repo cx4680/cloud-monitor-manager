@@ -14,7 +14,7 @@ func loadRouters() {
 	monitorProductRouters()
 	monitorItemRouters()
 	instance()
-	MonitorReportForm()
+	MonitorChart()
 }
 
 func actuatorMapping() {
@@ -47,17 +47,17 @@ func monitorItemRouters() {
 	monitorItemCtl := controller.NewMonitorItemCtl()
 	group := Router.Group(pathPrefix + "monitorItem/")
 	{
-		group.GET("/getMonitorItemByProductBizId", monitorItemCtl.GetMonitorItemsById)
+		group.GET("/getMonitorItemByProductId", monitorItemCtl.GetMonitorItemByProductId)
 	}
 }
 
-func MonitorReportForm() {
-	monitorReportFormCtl := controller.NewMonitorReportFormController()
-	group := Router.Group(pathPrefix + "MonitorReportForm/")
+func MonitorChart() {
+	monitorChartCtl := controller.NewMonitorChartController()
+	group := Router.Group(pathPrefix + "MonitorChart/")
 	{
-		group.GET("/getData", monitorReportFormCtl.GetData)
-		group.GET("/getRangeData", monitorReportFormCtl.GetRangeData)
-		group.GET("/getTop", monitorReportFormCtl.GetTop)
+		group.GET("/getData", monitorChartCtl.GetData)
+		group.GET("/getRangeData", monitorChartCtl.GetRangeData)
+		group.GET("/getTopData", monitorChartCtl.GetTopData)
 	}
 }
 

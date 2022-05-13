@@ -17,7 +17,7 @@ func NewMonitorItemService() *MonitorItemService {
 	}
 }
 
-func (s *MonitorItemService) GetMonitorItem(param form.MonitorItemParam) []model.MonitorItem {
+func (s *MonitorItemService) GetMonitorItemByProductId(param form.MonitorItemParam) []model.MonitorItem {
 	return s.dao.GetMonitorItem(param.ProductBizId, param.OsType, param.Display)
 }
 

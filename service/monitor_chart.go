@@ -42,7 +42,7 @@ func (s *MonitorChartService) GetData(request form.PrometheusRequest) (*form.Pro
 	return prometheusValue, nil
 }
 
-func (s *MonitorChartService) GetAxisData(request form.PrometheusRequest) (*form.PrometheusAxis, error) {
+func (s *MonitorChartService) GetRangeData(request form.PrometheusRequest) (*form.PrometheusAxis, error) {
 	if strutil.IsBlank(request.Instance) {
 		return nil, errors.NewBusinessError("instance为空")
 	}
@@ -73,26 +73,22 @@ func (s *MonitorChartService) GetAxisData(request form.PrometheusRequest) (*form
 	return prometheusAxis, nil
 }
 
-//func (s *MonitorChartService) GetTopData(request form.PrometheusRequest) ([]form.PrometheusInstance, error) {
-//instances, err := getInstances(request.ProductCode)
-//if err != nil {
-//	return nil, err
-//}
-//if strutil.IsBlank(instances) {
-//	return nil, nil
-//}
-//pql := fmt.Sprintf(constant.TopExpr, "5", strings.ReplaceAll(getMonitorItemByName(request.Name).MetricsLinux, constant.MetricLabel, constant.INSTANCE+"=~'"+instances+"'"))
-//result := Query(pql, request.Time).Data.Result
-//var instanceList []form.PrometheusInstance
-//for i := range result {
-//	instanceDTO := form.PrometheusInstance{
-//		Instance: result[i].Metric[constant.INSTANCE],
-//		Value:    changeDecimal(result[i].Value[1].(string)),
-//	}
-//	instanceList = append(instanceList, instanceDTO)
-//}
-//return instanceList, nil
-//}
+func (s *MonitorChartService) GetTopData(request form.PrometheusRequest) ([]form.PrometheusInstance, error) {
+	if strutil.IsBlank(request.Name) {
+		return nil, errors.NewBusinessError("监控指标不能为空")
+	}
+	pql := fmt.Sprintf(constant.TopExpr, request.TopNum, strings.ReplaceAll(dao.MonitorItem.GetMonitorItemCacheByMetricCode(request.Name).Expression, constant.MetricLabel, "instanceType='"+request.InstanceType+"'"))
+	result := s.prometheus.Query(pql, request.Time).Data.Result
+	var instanceList []form.PrometheusInstance
+	for i := range result {
+		instanceDTO := form.PrometheusInstance{
+			Instance: result[i].Metric[constant.INSTANCE],
+			Value:    changeDecimal(result[i].Value[1].(string)),
+		}
+		instanceList = append(instanceList, instanceDTO)
+	}
+	return instanceList, nil
+}
 
 //获取区间数的值，为采集到的时间点位设为null
 func yAxisFillEmptyData(result []form.PrometheusResult, timeList []string, label string, instanceId string) map[string][]string {

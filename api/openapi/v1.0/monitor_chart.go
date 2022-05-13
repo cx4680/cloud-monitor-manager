@@ -21,7 +21,7 @@ type MonitorChartCtl struct {
 	service *service.MonitorChartService
 }
 
-func NewMonitorReportFormController() *MonitorChartCtl {
+func NewMonitorChartController() *MonitorChartCtl {
 	return &MonitorChartCtl{service.NewMonitorChartService()}
 }
 

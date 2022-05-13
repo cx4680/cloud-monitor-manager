@@ -1,15 +1,10 @@
 package form
 
 type PrometheusRequest struct {
-	TenantId    string `form:"tenantId"`
-	ProductCode string `form:"productCode"`
-	Name        string `form:"name"`
-	Instance    string `form:"instance"`
-	Labels      string `form:"labels"`
-	/**
-	 * 范围查询 s(秒)  m(分钟)  h(小时)  d(天)  w(周)  y(年)
-	 */
-	Scope string `form:"range"`
+	InstanceType string `form:"instanceType"`
+	Name         string `form:"name"`
+	Instance     string `form:"instance"`
+	TopNum       string `form:"topNum"`
 	/**
 	 * 瞬时数据查询参数 时间戳
 	 */

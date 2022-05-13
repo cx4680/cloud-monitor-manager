@@ -5,6 +5,4 @@ const (
 	FILTER      = "device!='tmpfs'"
 	MetricLabel = "$INSTANCE"
 	TopExpr     = "topk(%s,(%s))"
-
-	TenantId = "accountId"
 )
