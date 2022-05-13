@@ -58,14 +58,15 @@ func (mpc *MonitorChartCtl) GetMonitorDatas(c *gin.Context) {
 	}
 	label := getLabel(monitorItem.Labels)
 	result := MonitorRangeData{
-		RequestId:  openapi.GetRequestId(c),
-		MetricCode: metricCode,
-		Times:      timeList,
-		StartTime:  util.TimestampToFullTimeFmtStr(int64(param.StartTime)),
-		EndTime:    util.TimestampToFullTimeFmtStr(int64(param.EndTime)),
-		Step:       param.Step,
-		Dimension:  label,
-		Points:     pointsFillEmptyRangeData(prometheusResult, timeList, label, resourceId),
+		RequestId:           openapi.GetRequestId(c),
+		MetricCode:          metricCode,
+		ProductAbbreviation: monitorItem.ProductAbbreviation,
+		Times:               timeList,
+		StartTime:           util.TimestampToFullTimeFmtStr(int64(param.StartTime)),
+		EndTime:             util.TimestampToFullTimeFmtStr(int64(param.EndTime)),
+		Step:                param.Step,
+		Dimension:           label,
+		Points:              pointsFillEmptyRangeData(prometheusResult, timeList, label, resourceId),
 	}
 	c.JSON(http.StatusOK, result)
 }
@@ -86,11 +87,12 @@ func (mpc *MonitorChartCtl) GetMonitorData(c *gin.Context) {
 	prometheusResult := service.NewPrometheusService().Query(pql, "").Data.Result
 	label := getLabel(monitorItem.Labels)
 	result := MonitorData{
-		RequestId:   openapi.GetRequestId(c),
-		MetricCode:  metricCode,
-		Dimension:   label,
-		CurrentTime: util.GetNowStr(),
-		Points:      pointsFillEmptyData(prometheusResult, label, resourceId),
+		RequestId:           openapi.GetRequestId(c),
+		MetricCode:          metricCode,
+		ProductAbbreviation: monitorItem.ProductAbbreviation,
+		Dimension:           label,
+		CurrentTime:         util.GetNowStr(),
+		Points:              pointsFillEmptyData(prometheusResult, label, resourceId),
 	}
 	c.JSON(http.StatusOK, result)
 }

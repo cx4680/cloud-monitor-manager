@@ -10,6 +10,7 @@ func loadOpenApiV1Routers() {
 	monitorProductOpenApiV1Routers(group)
 	monitorItemOpenApiV1Routers(group)
 	MonitorReportOpenApiV1Routers(group)
+	ResourceOpenApiV1Routers(group)
 }
 
 func monitorProductOpenApiV1Routers(group *gin.RouterGroup) {

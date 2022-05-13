@@ -10,5 +10,6 @@ const (
 	UserId       = "userId"
 	UserType     = "userType"
 	UserName     = "userName"
+	UserID       = "userId"
 	ResourceName = "ResourceName"
 )

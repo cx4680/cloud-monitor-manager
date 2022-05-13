@@ -25,7 +25,7 @@ func Paginate(pageSize int, current int, sql string, sqlParam []interface{}, ret
 		offset := ((current) - 1) * (pageSize)
 		sqlParam = append(sqlParam, pageSize)
 		sqlParam = append(sqlParam, offset)
-		db.Raw(sql+"  limit ?formset ?", sqlParam...).Find(retPoint)
+		db.Raw(sql+"  limit ? offset ?", sqlParam...).Find(retPoint)
 	}
 
 	return &form.PageVO{

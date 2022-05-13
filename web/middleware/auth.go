@@ -4,6 +4,7 @@ import (
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/config"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/global"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/global/openapi"
+	"code.cestc.cn/ccos-ops/cloud-monitor-manager/logger"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/util/jsonutil"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/util/strutil"
 	"encoding/base64"
@@ -77,11 +78,16 @@ func ParsingAndSetUserInfo(c *gin.Context) error {
 			return err
 		}
 		if strutil.IsNotBlank(string(userInfoDecode)) {
+			logger.Logger().Infof(`userInfo: %s`, string(userInfoDecode))
 			jsonutil.ToObject(string(userInfoDecode), &userMap)
-			c.Set(global.UserType, userMap["userTypeCode"])
-			c.Set(global.TenantId, userMap["cloudLoginId"])
-			c.Set(global.UserId, userMap["loginId"])
-			c.Set(global.UserName, userMap["loginCode"])
+			if strutil.IsBlank(userMap["staffId"]) {
+				userMap["staffId"] = "0"
+			}
+			if strutil.IsBlank(userMap["staffName"]) {
+				userMap["staffName"] = "inner service"
+			}
+			c.Set(global.UserID, userMap["staffId"])
+			c.Set(global.UserName, userMap["staffName"])
 			return nil
 		}
 	}
