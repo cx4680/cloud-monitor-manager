@@ -39,8 +39,8 @@ type PrometheusValue struct {
 }
 
 type PrometheusAxis struct {
-	XAxis []string            `json:"xaxis"`
-	YAxis map[string][]string `json:"yaxis"`
+	TimeAxis  []string            `json:"timeAxis"`
+	ValueAxis map[string][]string `json:"valueAxis"`
 }
 
 type PrometheusInstance struct {

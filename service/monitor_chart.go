@@ -67,8 +67,8 @@ func (s *MonitorChartService) GetRangeData(request form.PrometheusRequest) (*for
 		timeList = getTimeList(start, end, step, int(result[0].Values[0][0].(float64)))
 	}
 	prometheusAxis := &form.PrometheusAxis{
-		XAxis: timeList,
-		YAxis: yAxisFillEmptyData(result, timeList, label, request.Instance),
+		TimeAxis:  timeList,
+		ValueAxis: valueAxisFillEmptyData(result, timeList, label, request.Instance),
 	}
 	return prometheusAxis, nil
 }
@@ -91,7 +91,7 @@ func (s *MonitorChartService) GetTopData(request form.PrometheusRequest) ([]form
 }
 
 //获取区间数的值，为采集到的时间点位设为null
-func yAxisFillEmptyData(result []form.PrometheusResult, timeList []string, label string, instanceId string) map[string][]string {
+func valueAxisFillEmptyData(result []form.PrometheusResult, timeList []string, label string, instanceId string) map[string][]string {
 	resultMap := make(map[string][]string)
 	for i := range result {
 		timeMap := map[string]string{}
