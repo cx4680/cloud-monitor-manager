@@ -1,10 +1,9 @@
 package form
 
 type MonitorItemParam struct {
-	BizIdList    []string `form:"bizIdList"`
-	ProductBizId string   `form:"productBizId"`
-	OsType       string   `form:"osType"`
-	Display      string   `form:"display"`
+	ProductBizId string `form:"productBizId"`
+	OsType       string `form:"osType"`
+	Display      string `form:"display"`
 }
 
 type MonitorItem struct {

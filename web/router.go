@@ -39,7 +39,7 @@ func monitorProductRouters() {
 	monitorProductCtl := controller.NewMonitorProductCtl()
 	group := Router.Group(pathPrefix + "monitorProduct/")
 	{
-		group.GET("/getAllMonitorProduct", monitorProductCtl.GetMonitorProduct)
+		group.GET("/getMonitorProduct", monitorProductCtl.GetMonitorProduct)
 	}
 }
 
@@ -47,7 +47,7 @@ func monitorItemRouters() {
 	monitorItemCtl := controller.NewMonitorItemCtl()
 	group := Router.Group(pathPrefix + "monitorItem/")
 	{
-		group.GET("/getMonitorItemByProductId", monitorItemCtl.GetMonitorItemByProductId)
+		group.GET("/getMonitorItemByProductBizId", monitorItemCtl.GetMonitorItemByProductBizId)
 	}
 }
 

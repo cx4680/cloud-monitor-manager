@@ -21,7 +21,6 @@ type InstanceCommonVO struct {
 }
 
 type InstancePageForm struct {
-	ProductCode  string `form:"productCode"`
 	InstanceId   string `form:"instanceId"`
 	InstanceName string `form:"instanceName"`
 	RegionCode   string `form:"regionCode"`

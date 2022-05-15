@@ -17,9 +17,9 @@ CREATE TABLE `t_monitor_product`  (
                                       PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 16 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
-INSERT INTO `t_monitor_product` VALUES ('1', '云服务器ECS', 1, 'ecs', NULL, NULL, '/productmonitoring/ecs', '0 0 0/1 * * ?', 'http://cus-rc.cbc01.intranet.cecloudcs.com', '/rc/resource/page/outer', 'ecs', NULL, NULL, '云产品监控');
-INSERT INTO `t_monitor_product` VALUES ('2', '弹性公网IP', 1, 'eip', NULL, NULL, '/productmonitoring/eip', '0 0 0/1 * * ?', 'http://cus-rc.cbc01.intranet.cecloudcs.com', '/rc/resource/page/outer', 'eip', NULL, NULL, '云产品监控');
-INSERT INTO `t_monitor_product` VALUES ('3', '负载均衡SLB', 1, 'slb', NULL, NULL, '/productmonitoring/slb', '0 0 0/1 * * ?', 'http://cus-rc.cbc01.intranet.cecloudcs.com', '/rc/resource/page/outer', 'slb', NULL, NULL, '云产品监控');
+INSERT INTO `t_monitor_product` VALUES ('1', '云服务器ECS', 1, 'ecs', NULL, NULL, '/productmonitoring/ecs', '0 0 0/1 * * ?', 'http://cus-resource-center-svc.product-cec-cbc', '/rc/resource/page/outer', 'ecs', NULL, NULL, '云产品监控');
+INSERT INTO `t_monitor_product` VALUES ('2', '弹性公网IP', 1, 'eip', NULL, NULL, '/productmonitoring/eip', '0 0 0/1 * * ?', 'http://cus-resource-center-svc.product-cec-cbc', '/rc/resource/page/outer', 'eip', NULL, NULL, '云产品监控');
+INSERT INTO `t_monitor_product` VALUES ('3', '负载均衡SLB', 1, 'slb', NULL, NULL, '/productmonitoring/slb', '0 0 0/1 * * ?', 'http://cus-resource-center-svc.product-cec-cbc', '/rc/resource/page/outer', 'slb', NULL, NULL, '云产品监控');
 -- INSERT INTO `t_monitor_product` VALUES ('4', '云备份CBR', 1, 'cbr', NULL, NULL, '/productmonitoring/cbr', '0 0 0/1 * * ?', 'http://product-backup-backup-manage.product-backup', '/noauth/backup/vault/pageList', 'cbr', NULL, NULL, '云产品监控');
 -- INSERT INTO `t_monitor_product` VALUES ('5', 'NAT网关', 1, 'nat', NULL, NULL, '/productmonitoring/nat', '0 0 0/1 * * ?', 'http://product-nat-controller-nat-manage.product-nat-gw', '/nat-gw/inner/nat/page', 'nat', NULL, NULL, '云产品监控');
 -- INSERT INTO `t_monitor_product` VALUES ('6', '云数据库MySQL', 1, 'mysql', NULL, NULL, '/productmonitoring/mysql', '0 0 0/1 * * ?', 'http://product-mysql-rds-mysql-manage.product-mysql.svc.cluster.local:8888', '/v1/mysql/instance', 'mysql', NULL, NULL, '云产品监控');

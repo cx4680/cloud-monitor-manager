@@ -20,7 +20,7 @@ func NewMonitorItemCtl() *MonitorItemCtl {
 
 var displayList = []string{"chart", "rule", "scaling"}
 
-func (mic *MonitorItemCtl) GetMonitorItemByProductId(c *gin.Context) {
+func (mic *MonitorItemCtl) GetMonitorItemByProductBizId(c *gin.Context) {
 	var param form.MonitorItemParam
 	err := c.ShouldBindQuery(&param)
 	if err != nil {
@@ -32,7 +32,7 @@ func (mic *MonitorItemCtl) GetMonitorItemByProductId(c *gin.Context) {
 		c.JSON(http.StatusOK, global.NewError("查询失败，展示参数错误"))
 		return
 	}
-	c.JSON(http.StatusOK, global.NewSuccess("查询成功", mic.service.GetMonitorItemByProductId(param)))
+	c.JSON(http.StatusOK, global.NewSuccess("查询成功", mic.service.GetMonitorItemByProductBizId(param)))
 }
 
 func checkDisplay(display string) bool {

@@ -64,7 +64,7 @@ type EcsList struct {
 
 func (ecs *EcsInstanceService) ConvertRealForm(f service.InstancePageForm) interface{} {
 	param := EcsRequest{
-		CloudProductCode: f.ProductCode,
+		CloudProductCode: f.Product,
 		ResourceTypeCode: "instance",
 		ResourceId:       f.InstanceId,
 		Name:             f.InstanceName,
@@ -82,7 +82,7 @@ func (ecs *EcsInstanceService) DoRequest(url string, f interface{}) (interface{}
 	if err != nil {
 		return nil, err
 	}
-	var resp EcsRequest
+	var resp EcsResponse
 	jsonutil.ToObject(respStr, &resp)
 	return resp, nil
 }
