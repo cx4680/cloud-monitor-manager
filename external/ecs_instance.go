@@ -102,6 +102,7 @@ func (ecs *EcsInstanceService) ConvertResp(realResp interface{}) (int, []service
 			list = append(list, service.InstanceCommonVO{
 				InstanceId:   d.ResourceId,
 				InstanceName: d.ResourceName,
+				TenantId:     d.TenantId,
 				Labels: []service.InstanceLabel{{
 					Name:  "status",
 					Value: d.StatusDesc,

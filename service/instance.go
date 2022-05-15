@@ -17,6 +17,7 @@ type InstanceLabel struct {
 type InstanceCommonVO struct {
 	InstanceId   string          `json:"instanceId"`
 	InstanceName string          `json:"instanceName"`
+	TenantId     string          `json:"tenantId"`
 	Labels       []InstanceLabel `json:"labels"`
 }
 
