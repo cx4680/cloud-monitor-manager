@@ -259,3 +259,51 @@ INSERT INTO `t_monitor_item` VALUES ('44', '3', '7层协议返回客户端5xx状
 -- INSERT INTO `t_monitor_item` VALUES ('188', '14', '服务出口带宽监控', 'guard_bandwidth_service_egress', 'instance,service', 'sum by(instance,service)(rate(guard_bandwidth{type=\"egress\",$INSTANCE}[3m]))', NULL, NULL, 'Byte/s', NULL, NULL, 1, 1, NULL, NULL, NULL, NULL, NULL, 'chart');
 -- INSERT INTO `t_monitor_item` VALUES ('189', '14', '接口调用量', 'guard_http_apirequests', 'instance,service,route', 'guard_http_apirequests{$INSTANCE}', NULL, NULL, '次', NULL, NULL, 1, 1, NULL, NULL, NULL, NULL, NULL, 'chart');
 -- INSERT INTO `t_monitor_item` VALUES ('190', '14', '服务调用量', 'guard_http_servicerequests', 'instance,service', 'guard_http_apirequests{$INSTANCE}', NULL, NULL, '次', NULL, NULL, 1, 1, NULL, NULL, NULL, NULL, NULL, 'chart');
+
+DROP TABLE IF EXISTS `t_config_item`;
+CREATE TABLE `t_config_item`
+(
+    `biz_id`   varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '-1' COMMENT '业务Id',
+    `p_biz_id` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '-1' COMMENT '上级业务Id',
+    `name`     varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '配置名称',
+    `code`     varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '配置编码',
+    `data`     varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '配置值',
+    `sort_id`  int NULL DEFAULT 0 COMMENT '排序',
+    `remark`   varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '备注',
+    `id`       bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+    PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
+
+INSERT INTO `t_config_item` VALUES ('1', '-1', '统计周期', NULL, NULL, 0, NULL, NULL);
+INSERT INTO `t_config_item` VALUES ('10', '2', '持续3个周期', '3', '3', 1, NULL, NULL);
+INSERT INTO `t_config_item` VALUES ('11', '2', '持续5个周期', '5', '5', 2, NULL, NULL);
+INSERT INTO `t_config_item` VALUES ('12', '3', '平均值', 'Average', 'avg', 0, NULL, NULL);
+INSERT INTO `t_config_item` VALUES ('13', '3', '最大值', 'Maximum', 'max', 1, NULL, NULL);
+INSERT INTO `t_config_item` VALUES ('14', '3', '最小值', 'Minimum', 'min', 2, NULL, NULL);
+INSERT INTO `t_config_item` VALUES ('15', '4', '大于', 'greater', '>', 0, NULL, NULL);
+INSERT INTO `t_config_item` VALUES ('16', '4', '大于等于', 'greaterOrEqual', '>=', 1, NULL, NULL);
+INSERT INTO `t_config_item` VALUES ('17', '4', '小于', 'less', '<', 2, NULL, NULL);
+INSERT INTO `t_config_item` VALUES ('18', '4', '小于等于', 'lessOrEqual', '<=', 3, NULL, NULL);
+INSERT INTO `t_config_item` VALUES ('19', '4', '等于', 'equal', '==', 4, NULL, NULL);
+INSERT INTO `t_config_item` VALUES ('2', '-1', '持续周期', NULL, NULL, 0, NULL, NULL);
+INSERT INTO `t_config_item` VALUES ('20', '4', '不等于', 'notEqual', '!=', 5, NULL, NULL);
+INSERT INTO `t_config_item` VALUES ('21', '-1', '概览监控项', NULL, NULL, 0, NULL, NULL);
+INSERT INTO `t_config_item` VALUES ('22', '21', 'CPU使用率（操作系统）', NULL, 'ecs_cpu_usage', 0, NULL, NULL);
+INSERT INTO `t_config_item` VALUES ('23', '21', '内存使用率（操作系统）', NULL, 'ecs_memory_usage', 1, NULL, NULL);
+INSERT INTO `t_config_item` VALUES ('28', '-1', '监控周期', NULL, NULL, 0, NULL, NULL);
+INSERT INTO `t_config_item` VALUES ('29', '28', '紧急', '1', 'MAIN', 0, NULL, NULL);
+INSERT INTO `t_config_item` VALUES ('3', '-1', '统计方式', NULL, NULL, 0, NULL, NULL);
+INSERT INTO `t_config_item` VALUES ('30', '28', '重要', '2', 'MARJOR', 0, NULL, NULL);
+INSERT INTO `t_config_item` VALUES ('31', '28', '次要', '3', 'MINOR', 0, NULL, NULL);
+INSERT INTO `t_config_item` VALUES ('32', '28', '提醒', '4', 'WARN', 0, NULL, NULL);
+INSERT INTO `t_config_item` VALUES ('4', '-1', '对比方式', NULL, NULL, 0, NULL, NULL);
+INSERT INTO `t_config_item` VALUES ('5', '-1', '监控数据', NULL, NULL, 0, NULL, NULL);
+INSERT INTO `t_config_item` VALUES ('51', '5', '0-3H', '0,3', '60', 1, NULL, NULL);
+INSERT INTO `t_config_item` VALUES ('52', '5', '3H-12H', '3,12', '180', 2, NULL, NULL);
+INSERT INTO `t_config_item` VALUES ('53', '5', '12H-3D', '12,72', '900', 3, NULL, NULL);
+INSERT INTO `t_config_item` VALUES ('54', '5', '3D-10D', '72,240', '2700', 4, NULL, NULL);
+INSERT INTO `t_config_item` VALUES ('55', '-1', '监控周期', NULL, NULL, 0, NULL, NULL);
+INSERT INTO `t_config_item` VALUES ('6', '1', '5分钟', '300', '5m', 1, NULL, NULL);
+INSERT INTO `t_config_item` VALUES ('7', '1', '15分钟', '900', '15m', 2, NULL, NULL);
+INSERT INTO `t_config_item` VALUES ('8', '1', '30分钟', '1800', '30m', 3, NULL, NULL);
+INSERT INTO `t_config_item` VALUES ('9', '2', '持续1个周期', '1', '1', 0, NULL, NULL);

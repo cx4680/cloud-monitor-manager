@@ -5,14 +5,13 @@ import (
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/util/httputil"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/util/jsonutil"
 	"strconv"
-	"strings"
 )
 
-type EcsInstanceService struct {
+type EipInstanceService struct {
 	service.InstanceServiceImpl
 }
 
-type EcsRequest struct {
+type EipRequest struct {
 	CloudProductCode string   `json:"cloudProductCode"`
 	ResourceTypeCode string   `json:"resourceTypeCode"`
 	ResourceId       string   `json:"resourceId"`
@@ -24,19 +23,19 @@ type EcsRequest struct {
 	CurrPage         string   `json:"currPage"`
 }
 
-type EcsResponse struct {
+type EipResponse struct {
 	Code    string  `json:"code"`
 	Msg     string  `json:"msg"`
 	TraceId string  `json:"traceId"`
-	Data    EcsPage `json:"data"`
+	Data    EipPage `json:"data"`
 }
 
-type EcsPage struct {
+type EipPage struct {
 	Total int        `json:"total"`
-	List  []*EcsList `json:"list"`
+	List  []*EipList `json:"list"`
 }
 
-type EcsList struct {
+type EipList struct {
 	Id               int    `json:"id"`
 	UuidStr          string `json:"uuidStr"`
 	RegionCode       string `json:"regionCode"`
@@ -60,15 +59,19 @@ type EcsList struct {
 	ResUpdateTime    string `json:"resUpdateTime"`
 	Creator          string `json:"creator"`
 	Modifier         string `json:"modifier"`
-	OsType           string `json:"osType"`
 }
 
-type EcsAdditional struct {
-	OsType string `json:"osType"`
+type EipAdditional struct {
+	BandWidth struct {
+		BandwidthId   string `json:"bandwidthId"`
+		BandWidthSize string `json:"BandWidthSize"`
+	} `json:"bandWidth"`
+	BindInstanceId string `json:"bindInstanceId"`
+	EipIpAddress   string `json:"eipIpAddress"`
 }
 
-func (ecs *EcsInstanceService) ConvertRealForm(f service.InstancePageForm) interface{} {
-	param := EcsRequest{
+func (ecs *EipInstanceService) ConvertRealForm(f service.InstancePageForm) interface{} {
+	param := EipRequest{
 		CloudProductCode: f.Product,
 		ResourceTypeCode: "instance",
 		ResourceId:       f.InstanceId,
@@ -82,23 +85,23 @@ func (ecs *EcsInstanceService) ConvertRealForm(f service.InstancePageForm) inter
 	return param
 }
 
-func (ecs *EcsInstanceService) DoRequest(url string, f interface{}) (interface{}, error) {
+func (ecs *EipInstanceService) DoRequest(url string, f interface{}) (interface{}, error) {
 	respStr, err := httputil.HttpPostJson(url, f, nil)
 	if err != nil {
 		return nil, err
 	}
-	var resp EcsResponse
+	var resp EipResponse
 	jsonutil.ToObject(respStr, &resp)
 	return resp, nil
 }
 
-func (ecs *EcsInstanceService) ConvertResp(realResp interface{}) (int, []service.InstanceCommonVO) {
-	response := realResp.(EcsResponse)
+func (ecs *EipInstanceService) ConvertResp(realResp interface{}) (int, []service.InstanceCommonVO) {
+	response := realResp.(EipResponse)
 	var list []service.InstanceCommonVO
 	if response.Data.Total > 0 {
 		for _, d := range response.Data.List {
-			var ecsAdditional = &EcsAdditional{}
-			jsonutil.ToObject(d.Additional, ecsAdditional)
+			var eipAdditional = &EipAdditional{}
+			jsonutil.ToObject(d.Additional, eipAdditional)
 			list = append(list, service.InstanceCommonVO{
 				InstanceId:   d.ResourceId,
 				InstanceName: d.ResourceName,
@@ -106,20 +109,17 @@ func (ecs *EcsInstanceService) ConvertResp(realResp interface{}) (int, []service
 					Name:  "status",
 					Value: d.StatusDesc,
 				}, {
-					Name:  "osType",
-					Value: ecsAdditional.OsType,
+					Name:  "eipAddress",
+					Value: eipAdditional.EipIpAddress,
+				}, {
+					Name:  "bandWidth",
+					Value: eipAdditional.BandWidth.BandWidthSize,
+				}, {
+					Name:  "bindInstanceId",
+					Value: eipAdditional.BindInstanceId,
 				}},
 			})
 		}
 	}
 	return response.Data.Total, list
-}
-
-func toStringList(s string) []string {
-	statusList := strings.Split(s, ",")
-	var list []string
-	for _, v := range statusList {
-		list = append(list, v)
-	}
-	return list
 }

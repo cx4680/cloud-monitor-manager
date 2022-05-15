@@ -8,11 +8,11 @@ import (
 	"strings"
 )
 
-type EcsInstanceService struct {
+type SlbInstanceService struct {
 	service.InstanceServiceImpl
 }
 
-type EcsRequest struct {
+type SlbRequest struct {
 	CloudProductCode string   `json:"cloudProductCode"`
 	ResourceTypeCode string   `json:"resourceTypeCode"`
 	ResourceId       string   `json:"resourceId"`
@@ -24,19 +24,19 @@ type EcsRequest struct {
 	CurrPage         string   `json:"currPage"`
 }
 
-type EcsResponse struct {
+type SlbResponse struct {
 	Code    string  `json:"code"`
 	Msg     string  `json:"msg"`
 	TraceId string  `json:"traceId"`
-	Data    EcsPage `json:"data"`
+	Data    SlbPage `json:"data"`
 }
 
-type EcsPage struct {
+type SlbPage struct {
 	Total int        `json:"total"`
-	List  []*EcsList `json:"list"`
+	List  []*SlbList `json:"list"`
 }
 
-type EcsList struct {
+type SlbList struct {
 	Id               int    `json:"id"`
 	UuidStr          string `json:"uuidStr"`
 	RegionCode       string `json:"regionCode"`
@@ -63,12 +63,22 @@ type EcsList struct {
 	OsType           string `json:"osType"`
 }
 
-type EcsAdditional struct {
-	OsType string `json:"osType"`
+type SlbAdditional struct {
+	Address   string `json:"address"`
+	Spec      string `json:"spec"`
+	Vpc       string `json:"vpc"`
+	Container []struct {
+	} `json:"container"`
+	Listeners []struct {
+		ListenerId   string `json:"listenerId"`
+		ListenerName string `json:"listenerName"`
+		Port         int    `json:"port"`
+		Protocol     string `json:"protocol"`
+	} `json:"listeners"`
 }
 
-func (ecs *EcsInstanceService) ConvertRealForm(f service.InstancePageForm) interface{} {
-	param := EcsRequest{
+func (slb *SlbInstanceService) ConvertRealForm(f service.InstancePageForm) interface{} {
+	param := SlbRequest{
 		CloudProductCode: f.Product,
 		ResourceTypeCode: "instance",
 		ResourceId:       f.InstanceId,
@@ -82,23 +92,23 @@ func (ecs *EcsInstanceService) ConvertRealForm(f service.InstancePageForm) inter
 	return param
 }
 
-func (ecs *EcsInstanceService) DoRequest(url string, f interface{}) (interface{}, error) {
+func (slb *SlbInstanceService) DoRequest(url string, f interface{}) (interface{}, error) {
 	respStr, err := httputil.HttpPostJson(url, f, nil)
 	if err != nil {
 		return nil, err
 	}
-	var resp EcsResponse
+	var resp SlbResponse
 	jsonutil.ToObject(respStr, &resp)
 	return resp, nil
 }
 
-func (ecs *EcsInstanceService) ConvertResp(realResp interface{}) (int, []service.InstanceCommonVO) {
-	response := realResp.(EcsResponse)
+func (slb *SlbInstanceService) ConvertResp(realResp interface{}) (int, []service.InstanceCommonVO) {
+	response := realResp.(SlbResponse)
 	var list []service.InstanceCommonVO
 	if response.Data.Total > 0 {
 		for _, d := range response.Data.List {
-			var ecsAdditional = &EcsAdditional{}
-			jsonutil.ToObject(d.Additional, ecsAdditional)
+			var slbAdditional = &SlbAdditional{}
+			jsonutil.ToObject(d.Additional, slbAdditional)
 			list = append(list, service.InstanceCommonVO{
 				InstanceId:   d.ResourceId,
 				InstanceName: d.ResourceName,
@@ -106,8 +116,20 @@ func (ecs *EcsInstanceService) ConvertResp(realResp interface{}) (int, []service
 					Name:  "status",
 					Value: d.StatusDesc,
 				}, {
-					Name:  "osType",
-					Value: ecsAdditional.OsType,
+					Name:  "address",
+					Value: slbAdditional.Address,
+				}, {
+					Name:  "vpcName",
+					Value: slbAdditional.Vpc,
+				}, {
+					Name:  "vpcId",
+					Value: slbAdditional.Vpc,
+				}, {
+					Name:  "spec",
+					Value: slbAdditional.Spec,
+				}, {
+					Name:  "listener",
+					Value: getListenerList(slbAdditional),
 				}},
 			})
 		}
@@ -115,11 +137,10 @@ func (ecs *EcsInstanceService) ConvertResp(realResp interface{}) (int, []service
 	return response.Data.Total, list
 }
 
-func toStringList(s string) []string {
-	statusList := strings.Split(s, ",")
-	var list []string
-	for _, v := range statusList {
-		list = append(list, v)
+func getListenerList(slb *SlbAdditional) string {
+	var listener []string
+	for _, v := range slb.Listeners {
+		listener = append(listener, v.ListenerName)
 	}
-	return list
+	return strings.Join(listener, ",")
 }
