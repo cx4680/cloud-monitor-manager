@@ -77,7 +77,7 @@ func (s *MonitorChartService) GetTopData(request form.PrometheusRequest) ([]form
 	if strutil.IsBlank(request.Name) {
 		return nil, errors.NewBusinessError("监控指标不能为空")
 	}
-	pql := fmt.Sprintf(constant.TopExpr, request.TopNum, strings.ReplaceAll(dao.MonitorItem.GetMonitorItemCacheByMetricCode(request.Name).Expression, constant.MetricLabel, "instanceType='"+request.InstanceType+"'"))
+	pql := fmt.Sprintf(constant.TopExpr, request.TopNum, strings.ReplaceAll(dao.MonitorItem.GetMonitorItemCacheByMetricCode(request.Name).Expression, constant.MetricLabel, ""))
 	result := s.prometheus.Query(pql, request.Time).Data.Result
 	var instanceList []form.PrometheusInstance
 	for i := range result {
