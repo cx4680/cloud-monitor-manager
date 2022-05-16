@@ -67,6 +67,7 @@ type SlbAdditional struct {
 	Address   string `json:"address"`
 	Spec      string `json:"spec"`
 	Vpc       string `json:"vpc"`
+	VpcName   string `json:"vpcName"`
 	Container []struct {
 	} `json:"container"`
 	Listeners []struct {
@@ -121,7 +122,7 @@ func (slb *SlbInstanceService) ConvertResp(realResp interface{}) (int, []service
 					Value: slbAdditional.Address,
 				}, {
 					Name:  "vpcName",
-					Value: slbAdditional.Vpc,
+					Value: slbAdditional.VpcName,
 				}, {
 					Name:  "vpcId",
 					Value: slbAdditional.Vpc,
