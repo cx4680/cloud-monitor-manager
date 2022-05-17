@@ -35,12 +35,5 @@ func (dao *ConfigItemDao) GetConfigItemList(pBizId int64) []*model.ConfigItem {
 }
 
 const (
-	StatisticalPeriodPid  = 1  //统计周期
-	ContinuousCyclePid    = 2  //持续周期
-	StatisticalMethodsPid = 3  //统计方式
-	ComparisonMethodPid   = 4  //对比方式
-	OverviewItemPid       = 21 //概览监控项
-	RegionListPid         = 24 //region列表
-	MonitorRange          = 5  //监控周期
-	AlarmLevel            = 28 //告警级别
+	MonitorRange = 1 //监控周期
 )

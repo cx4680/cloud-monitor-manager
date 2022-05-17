@@ -74,11 +74,6 @@ func configItemRouters() {
 	ctl := controller.NewConfigItemCtl()
 	group := Router.Group(pathPrefix + "configItem/")
 	{
-		group.GET("/getStatisticalPeriodList", ctl.GetStatisticalPeriodList)
-		group.GET("/getContinuousCycleList", ctl.GetContinuousCycleList)
-		group.GET("/getStatisticalMethodsList", ctl.GetStatisticalMethodsList)
-		group.GET("/getComparisonMethodList", ctl.GetComparisonMethodList)
-		group.GET("/getOverviewItemList", ctl.GetOverviewItemList)
 		group.GET("/getMonitorRange", ctl.GetMonitorRange)
 	}
 }

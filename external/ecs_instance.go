@@ -60,7 +60,6 @@ type EcsList struct {
 	ResUpdateTime    string `json:"resUpdateTime"`
 	Creator          string `json:"creator"`
 	Modifier         string `json:"modifier"`
-	OsType           string `json:"osType"`
 }
 
 type EcsAdditional struct {
