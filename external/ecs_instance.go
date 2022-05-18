@@ -106,7 +106,7 @@ func (ecs *EcsInstanceService) ConvertResp(realResp interface{}) (int, []service
 					Name:  "status",
 					Value: d.StatusDesc,
 				}, {
-					Name:  "systemType",
+					Name:  "osType",
 					Value: ecsAdditional.SystemType,
 				}},
 			})
