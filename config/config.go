@@ -13,7 +13,6 @@ type AppConfig struct {
 	Db         DB           `yaml:"db"`
 	Logger     LogConfig    `yaml:"logger"`
 	HttpConfig HttpConfig   `yaml:"http"`
-	Rocketmq   Rocketmq     `yaml:"rocketmq"`
 	Prometheus Prometheus   `yaml:"prometheus"`
 	Common     CommonConfig `yaml:"common"`
 	Redis      RedisConfig  `yaml:"redis"`
@@ -21,16 +20,11 @@ type AppConfig struct {
 }
 
 type CommonConfig struct {
-	Env                    string `yaml:"env"`
-	EnvType                string `yaml:"envType"`
-	Nk                     string `yaml:"nk"`
-	TenantUrl              string `yaml:"tenantUrl"`
-	SmsCenterPath          string `yaml:"smsCenterPath"`
-	ActivateInformationUrl string `yaml:"activateInformationUrl"`
-	RegionName             string `yaml:"regionName"`
-	EcsInnerGateway        string `yaml:"ecs-inner-gateway"`
-	IsSingleRegion         bool   `yaml:"isSingleRegion"`
-	MsgUrl                 string `yaml:"msgUrl"`
+	Env        string `yaml:"env"`
+	EnvType    string `yaml:"envType"`
+	Nk         string `yaml:"nk"`
+	RegionName string `yaml:"regionName"`
+	Rc         string `yaml:"rc"`
 }
 
 type Serve struct {
@@ -101,17 +95,11 @@ func defaultAppConfig() AppConfig {
 			DataLogPrefix: "./logs/",
 			ServiceName:   "cloud-monitor-region",
 		},
-		Rocketmq: Rocketmq{
-			NameServer: "127.0.0.1:9876",
-		},
 		Common: CommonConfig{
-			Env:                    "local",
-			Nk:                     "",
-			TenantUrl:              "",
-			SmsCenterPath:          "",
-			ActivateInformationUrl: "",
-			RegionName:             uuid.New().String(),
-			EcsInnerGateway:        "",
+			Env:        "local",
+			Nk:         "",
+			RegionName: uuid.New().String(),
+			Rc:         "",
 		},
 	}
 }

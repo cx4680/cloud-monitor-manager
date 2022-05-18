@@ -1,12 +1,9 @@
 package service
 
 import (
-	"code.cestc.cn/ccos-ops/cloud-monitor-manager/dao"
+	"code.cestc.cn/ccos-ops/cloud-monitor-manager/config"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/form"
-	"code.cestc.cn/ccos-ops/cloud-monitor-manager/global"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/logger"
-	"code.cestc.cn/ccos-ops/cloud-monitor-manager/util/strutil"
-	"github.com/pkg/errors"
 )
 
 type InstanceLabel struct {
@@ -49,10 +46,7 @@ func (is *InstanceServiceImpl) GetPage(page InstancePageForm, stage InstanceStag
 	var err error
 	f := stage.ConvertRealForm(page)
 
-	url, err := is.getRequestUrl(page.Product)
-	if err != nil {
-		return nil, err
-	}
+	url := config.Cfg.Common.Rc
 	logger.Logger().Infof(" request  %+v ,%s", page, url)
 	resp, err := stage.DoRequest(url, f)
 	if err != nil {
@@ -67,15 +61,4 @@ func (is *InstanceServiceImpl) GetPage(page InstancePageForm, stage InstanceStag
 		Current: page.Current,
 		Pages:   (total / page.PageSize) + 1,
 	}, nil
-}
-
-func (is *InstanceServiceImpl) getRequestUrl(product string) (string, error) {
-	p := dao.MonitorProduct.GetByAbbreviation(global.DB, product)
-	if p == nil {
-		return "", errors.New("产品配置有误")
-	}
-	if strutil.IsBlank(p.Host) || strutil.IsBlank(p.PageUrl) {
-		return "", errors.New("产品配置有误")
-	}
-	return p.Host + p.PageUrl, nil
 }
