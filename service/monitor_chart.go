@@ -5,6 +5,9 @@ import (
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/dao"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/errors"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/form"
+	"code.cestc.cn/ccos-ops/cloud-monitor-manager/global"
+	"code.cestc.cn/ccos-ops/cloud-monitor-manager/util/httputil"
+	"code.cestc.cn/ccos-ops/cloud-monitor-manager/util/jsonutil"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/util/strutil"
 	"fmt"
 	"strconv"
@@ -29,6 +32,9 @@ func (s *MonitorChartService) GetData(request form.PrometheusRequest) (*form.Pro
 	if strutil.IsBlank(monitorItem.Code) {
 		return nil, errors.NewBusinessError("指标不存在")
 	}
+	if monitorItem.ProductAbbreviation == "ecs" {
+		request.Instance = changeEcsInstanceId(request.TenantId, request.Instance)
+	}
 	pql := strings.ReplaceAll(monitorItem.Expression, constant.MetricLabel, constant.INSTANCE+"='"+request.Instance+"',"+constant.FILTER)
 	prometheusResponse := s.prometheus.Query(pql, request.Time)
 	if len(prometheusResponse.Data.Result) == 0 {
@@ -47,6 +53,9 @@ func (s *MonitorChartService) GetRangeData(request form.PrometheusRequest) (*for
 		return nil, errors.NewBusinessError("instance为空")
 	}
 	monitorItem := dao.MonitorItem.GetMonitorItemCacheByMetricCode(request.Name)
+	if monitorItem.ProductAbbreviation == "ecs" {
+		request.Instance = changeEcsInstanceId(request.TenantId, request.Instance)
+	}
 	pql := strings.ReplaceAll(monitorItem.Expression, constant.MetricLabel, constant.INSTANCE+"='"+request.Instance+"',"+constant.FILTER)
 	prometheusResponse := s.prometheus.QueryRange(pql, strconv.Itoa(request.Start), strconv.Itoa(request.End), strconv.Itoa(request.Step))
 	result := prometheusResponse.Data.Result
@@ -137,4 +146,21 @@ func changeDecimal(value string) string {
 	}
 	v, _ := strconv.ParseFloat(value, 64)
 	return fmt.Sprintf("%.2f", v)
+}
+
+//ecs实例ID转换
+func changeEcsInstanceId(tenantId, instanceId string) string {
+	monitorProduct := dao.MonitorProduct.GetByAbbreviation(global.DB, "ecs")
+	response, _ := httputil.HttpGet(monitorProduct.Host + "/compute/ecs/ops/v1/" + tenantId + "/servers/" + instanceId)
+	var result EcsVo
+	jsonutil.ToObject(response, &result)
+	return result.Data.SerialNumber
+}
+
+type EcsVo struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+	Data    struct {
+		SerialNumber string `json:"serialNumber"`
+	} `json:"data"`
 }

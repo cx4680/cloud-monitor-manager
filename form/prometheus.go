@@ -1,7 +1,9 @@
 package form
 
 type PrometheusRequest struct {
+	TenantId     string `form:"tenantId"`
 	InstanceType string `form:"instanceType"`
+	Abbreviation string `form:"abbreviation"`
 	Name         string `form:"name"`
 	Instance     string `form:"instance"`
 	TopNum       string `form:"topNum"`

@@ -20,5 +20,5 @@ func (mpc *MonitorProductCtl) GetMonitorProduct(c *gin.Context) {
 }
 
 func (mpc *MonitorProductCtl) GetAllMonitorProduct(c *gin.Context) {
-	c.JSON(http.StatusOK, global.NewSuccess("查询成功", mpc.service.GetAllMonitorProduct()))
+	c.JSON(http.StatusOK, global.NewSuccess("查询成功", mpc.service.GetMonitorProduct()))
 }

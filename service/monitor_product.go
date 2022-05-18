@@ -17,12 +17,8 @@ func NewMonitorProductService() *MonitorProductService {
 	}
 }
 
-func (s *MonitorProductService) GetMonitorProduct() *[]model.MonitorProductDTO {
-	return s.dao.GetMonitorProductDTO()
-}
-
-func (s *MonitorProductService) GetAllMonitorProduct() *[]model.MonitorProduct {
-	return s.dao.GetAllMonitorProduct()
+func (s *MonitorProductService) GetMonitorProduct() *[]model.MonitorProduct {
+	return s.dao.GetMonitorProduct()
 }
 
 func (s *MonitorProductService) GetMonitorProductPage(pageSize int, pageNum int) *form.PageVO {
