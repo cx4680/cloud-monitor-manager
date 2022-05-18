@@ -14,7 +14,7 @@ func loadRouters() {
 	monitorProductRouters()
 	monitorItemRouters()
 	instance()
-	MonitorChart()
+	monitorChart()
 	configItemRouters()
 }
 
@@ -52,9 +52,9 @@ func monitorItemRouters() {
 	}
 }
 
-func MonitorChart() {
+func monitorChart() {
 	monitorChartCtl := controller.NewMonitorChartController()
-	group := Router.Group(pathPrefix + "MonitorChart/")
+	group := Router.Group(pathPrefix + "monitorChart/")
 	{
 		group.GET("/getData", monitorChartCtl.GetData)
 		group.GET("/getRangeData", monitorChartCtl.GetRangeData)
