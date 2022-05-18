@@ -15,10 +15,10 @@ var ProductInstanceServiceMap = map[string]service.InstanceService{
 	ECS: &EcsInstanceService{
 		InstanceServiceImpl: service.InstanceServiceImpl{},
 	},
-	EIP: &EcsInstanceService{
+	EIP: &EipInstanceService{
 		InstanceServiceImpl: service.InstanceServiceImpl{},
 	},
-	SLB: &EcsInstanceService{
+	SLB: &SlbInstanceService{
 		InstanceServiceImpl: service.InstanceServiceImpl{},
 	},
 }
