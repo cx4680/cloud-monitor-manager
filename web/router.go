@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-const pathPrefix = "/cmm/"
+const pathPrefix = "/api/cmm/"
 
 func loadRouters() {
 	actuatorMapping()
