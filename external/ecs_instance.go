@@ -63,7 +63,7 @@ type EcsList struct {
 }
 
 type EcsAdditional struct {
-	OsType string `json:"osType"`
+	SystemType string `json:"systemType"`
 }
 
 func (ecs *EcsInstanceService) ConvertRealForm(f service.InstancePageForm) interface{} {
@@ -106,8 +106,8 @@ func (ecs *EcsInstanceService) ConvertResp(realResp interface{}) (int, []service
 					Name:  "status",
 					Value: d.StatusDesc,
 				}, {
-					Name:  "osType",
-					Value: ecsAdditional.OsType,
+					Name:  "systemType",
+					Value: ecsAdditional.SystemType,
 				}},
 			})
 		}
