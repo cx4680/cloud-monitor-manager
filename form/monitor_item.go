@@ -8,6 +8,7 @@ type MonitorItemParam struct {
 
 type MonitorItem struct {
 	ProductAbbreviation string `gorm:"column:product_abbreviation" json:"ProductAbbreviation"`
+	Host                string `gorm:"column:host" json:"host"`
 	Expression          string `gorm:"column:metric_linux" json:"Expression"`
 	Labels              string `gorm:"column:labels" json:"Labels"`
 	Code                string `gorm:"column:metric_name" json:"ItemCode"`

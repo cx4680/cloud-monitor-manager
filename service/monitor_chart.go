@@ -5,7 +5,6 @@ import (
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/dao"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/errors"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/form"
-	"code.cestc.cn/ccos-ops/cloud-monitor-manager/global"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/util/httputil"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/util/jsonutil"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/util/strutil"
@@ -33,7 +32,7 @@ func (s *MonitorChartService) GetData(request form.PrometheusRequest) (*form.Pro
 		return nil, errors.NewBusinessError("指标不存在")
 	}
 	if monitorItem.ProductAbbreviation == "ecs" {
-		request.Instance = changeEcsInstanceId(request.TenantId, request.Instance)
+		request.Instance = changeEcsInstanceId(monitorItem.Host, request.TenantId, request.Instance)
 	}
 	pql := strings.ReplaceAll(monitorItem.Expression, constant.MetricLabel, constant.INSTANCE+"='"+request.Instance+"',"+constant.FILTER)
 	prometheusResponse := s.prometheus.Query(pql, request.Time)
@@ -54,7 +53,7 @@ func (s *MonitorChartService) GetRangeData(request form.PrometheusRequest) (*for
 	}
 	monitorItem := dao.MonitorItem.GetMonitorItemCacheByMetricCode(request.Name)
 	if monitorItem.ProductAbbreviation == "ecs" {
-		request.Instance = changeEcsInstanceId(request.TenantId, request.Instance)
+		request.Instance = changeEcsInstanceId(monitorItem.Host, request.TenantId, request.Instance)
 	}
 	pql := strings.ReplaceAll(monitorItem.Expression, constant.MetricLabel, constant.INSTANCE+"='"+request.Instance+"',"+constant.FILTER)
 	prometheusResponse := s.prometheus.QueryRange(pql, strconv.Itoa(request.Start), strconv.Itoa(request.End), strconv.Itoa(request.Step))
@@ -149,9 +148,8 @@ func changeDecimal(value string) string {
 }
 
 //ecs实例ID转换
-func changeEcsInstanceId(tenantId, instanceId string) string {
-	monitorProduct := dao.MonitorProduct.GetByAbbreviation(global.DB, "ecs")
-	response, _ := httputil.HttpGet(monitorProduct.Host + "/compute/ecs/ops/v1/" + tenantId + "/servers/" + instanceId)
+func changeEcsInstanceId(host, tenantId, instanceId string) string {
+	response, _ := httputil.HttpGet(host + "/compute/ecs/ops/v1/" + tenantId + "/servers/" + instanceId)
 	var result EcsVo
 	jsonutil.ToObject(response, &result)
 	return result.Data.SerialNumber
