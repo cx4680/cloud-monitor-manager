@@ -1,7 +1,6 @@
 package external
 
 import (
-	"code.cestc.cn/ccos-ops/cloud-monitor-manager/logger"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/service"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/util/httputil"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/util/jsonutil"
@@ -83,7 +82,6 @@ func (ecs *EcsInstanceService) ConvertRealForm(f service.InstancePageForm) inter
 }
 
 func (ecs *EcsInstanceService) DoRequest(url string, f interface{}) (interface{}, error) {
-	logger.Logger().Infof("form:%s", f.(EcsRequest))
 	respStr, err := httputil.HttpPostJson(url, f, nil)
 	if err != nil {
 		return nil, err
@@ -118,8 +116,11 @@ func (ecs *EcsInstanceService) ConvertResp(realResp interface{}) (int, []service
 }
 
 func toStringList(s string) []string {
-	statusList := strings.Split(s, ",")
 	var list []string
+	if len(s) == 0 {
+		return list
+	}
+	statusList := strings.Split(s, ",")
 	for _, v := range statusList {
 		list = append(list, v)
 	}
