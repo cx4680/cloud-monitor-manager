@@ -1,6 +1,7 @@
 package external
 
 import (
+	"code.cestc.cn/ccos-ops/cloud-monitor-manager/logger"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/service"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/util/httputil"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/util/jsonutil"
@@ -68,7 +69,7 @@ type EcsAdditional struct {
 
 func (ecs *EcsInstanceService) ConvertRealForm(f service.InstancePageForm) interface{} {
 	param := EcsRequest{
-		CloudProductCode: f.Product,
+		CloudProductCode: "ECS",
 		ResourceTypeCode: "instance",
 		ResourceId:       f.InstanceId,
 		Name:             f.InstanceName,
@@ -82,6 +83,7 @@ func (ecs *EcsInstanceService) ConvertRealForm(f service.InstancePageForm) inter
 }
 
 func (ecs *EcsInstanceService) DoRequest(url string, f interface{}) (interface{}, error) {
+	logger.Logger().Infof("form:%s", f.(EcsRequest))
 	respStr, err := httputil.HttpPostJson(url, f, nil)
 	if err != nil {
 		return nil, err
