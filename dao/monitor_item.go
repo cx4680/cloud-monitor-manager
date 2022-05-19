@@ -54,7 +54,7 @@ func (d *MonitorItemDao) GetMonitorItemCacheByMetricCode(metricCode string) form
 		logger.Logger().Info("获取监控项为空")
 		return monitorItemModel
 	}
-	if e := sys_redis.SetByTimeOut(metricCode, jsonutil.ToString(monitorItemModel), time.Hour); e != nil {
+	if e := sys_redis.SetByTimeOut("cloudMonitorManager-"+metricCode, jsonutil.ToString(monitorItemModel), time.Hour); e != nil {
 		logger.Logger().Error("设置监控项缓存错误, key=" + metricCode)
 	}
 	return monitorItemModel
