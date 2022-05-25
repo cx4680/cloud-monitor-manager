@@ -10,7 +10,6 @@ func ToString(obj interface{}) string {
 	if err != nil {
 		logger.Logger().Errorf("序列化json字符串失败, error:%v, data:%v", err, obj)
 	}
-	logger.Logger().Infof("序列化json字符串:%v", string(str))
 	return string(str)
 }
 
