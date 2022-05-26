@@ -99,8 +99,6 @@ func (mpc *MonitorChartCtl) GetMonitorData(c *gin.Context) {
 
 func (mpc *MonitorChartCtl) GetMonitorDataTop(c *gin.Context) {
 	metricCode := c.Param("MetricCode")
-	tenantId := c.Param("TenantId")
-	productCode := c.Param("ProductCode")
 	n := c.Param("N")
 	i, err := strconv.Atoi(n)
 	if err != nil || i <= 0 {
@@ -112,9 +110,8 @@ func (mpc *MonitorChartCtl) GetMonitorDataTop(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, openapi.NewRespError(openapi.MetricCodeInvalid, c))
 		return
 	}
-	instances := getInstances(tenantId, productCode)
 	//查询Prometheus
-	pql := fmt.Sprintf(constant.TopExpr, n, strings.ReplaceAll(monitorItem.Expression, constant.MetricLabel, constant.INSTANCE+"=~'"+instances+"'"))
+	pql := fmt.Sprintf(constant.TopExpr, n, strings.ReplaceAll(monitorItem.Expression, constant.MetricLabel, ""))
 	prometheusResult := service.NewPrometheusService().Query(pql, "").Data.Result
 	label := getLabel(monitorItem.Labels)
 	result := MonitorTopData{
@@ -143,9 +140,8 @@ func checkParam(resourceId, metricCode string) *openapi.ErrorCode {
 }
 
 //获取实例ID列表
-func getInstanceList(product string, tenantId string) []string {
+func getInstances(product string) string {
 	f := service.InstancePageForm{
-		TenantId: tenantId,
 		Product:  product,
 		Current:  1,
 		PageSize: 10000,
@@ -154,18 +150,13 @@ func getInstanceList(product string, tenantId string) []string {
 	stage, _ := instanceService.(service.InstanceStage)
 	page, err := instanceService.GetPage(f, stage)
 	if err != nil {
-		return nil
+		return ""
 	}
 	var instanceList []string
 	for _, v := range page.Records.([]service.InstanceCommonVO) {
 		instanceList = append(instanceList, v.InstanceId)
 	}
-	return instanceList
-}
-
-func getInstances(tenantId, product string) string {
-	list := getInstanceList(tenantId, product)
-	return strings.Join(list, "|")
+	return strings.Join(instanceList, "|")
 }
 
 func getLabel(labels string) string {

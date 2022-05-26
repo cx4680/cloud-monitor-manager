@@ -6,7 +6,7 @@ import (
 )
 
 func loadOpenApiV1Routers() {
-	group := Router.Group("/cmm/v1.0/")
+	group := Router.Group("/v1.0/")
 	monitorProductOpenApiV1Routers(group)
 	monitorItemOpenApiV1Routers(group)
 	monitorReportOpenApiV1Routers(group)
