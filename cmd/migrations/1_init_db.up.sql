@@ -279,6 +279,7 @@ CREATE TABLE `t_config_item`
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 INSERT INTO `t_config_item` (`biz_id`, `p_biz_id`, `name`, `code`, `data`, `sort_id`,`remark`) VALUES ('1', '-1', '监控周期', NULL, NULL, 0, NULL);
-INSERT INTO `t_config_item` (`biz_id`, `p_biz_id`, `name`, `code`, `data`, `sort_id`,`remark`) VALUES ('11', '1', '5分钟', '300', '5m', 1, NULL);
-INSERT INTO `t_config_item` (`biz_id`, `p_biz_id`, `name`, `code`, `data`, `sort_id`,`remark`) VALUES ('12', '1', '15分钟', '900', '15m', 2, NULL);
-INSERT INTO `t_config_item` (`biz_id`, `p_biz_id`, `name`, `code`, `data`, `sort_id`,`remark`) VALUES ('13', '1', '30分钟', '1800', '30m', 3, NULL);
+INSERT INTO `t_config_item` (`biz_id`, `p_biz_id`, `name`, `code`, `data`, `sort_id`,`remark`) VALUES ('11', '1', '0-3H', '0,3', '60', 1, null);
+INSERT INTO `t_config_item` (`biz_id`, `p_biz_id`, `name`, `code`, `data`, `sort_id`,`remark`) VALUES ('12', '1', '3H-12H', '3,12', '180', 2, null);
+INSERT INTO `t_config_item` (`biz_id`, `p_biz_id`, `name`, `code`, `data`, `sort_id`,`remark`) VALUES ('13', '1', '12H-3D', '12,72', '900', 3, null);
+INSERT INTO `t_config_item` (`biz_id`, `p_biz_id`, `name`, `code`, `data`, `sort_id`,`remark`) VALUES ('14', '1', '3D-10D', '72,240', '2700', 4, null);
