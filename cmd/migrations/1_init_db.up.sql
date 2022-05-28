@@ -279,7 +279,13 @@ CREATE TABLE `t_config_item`
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 INSERT INTO `t_config_item` (`biz_id`, `p_biz_id`, `name`, `code`, `data`, `sort_id`,`remark`) VALUES ('1', '-1', '监控周期', NULL, NULL, 0, NULL);
-INSERT INTO `t_config_item` (`biz_id`, `p_biz_id`, `name`, `code`, `data`, `sort_id`,`remark`) VALUES ('11', '1', '0-3H', '0,3', '60', 1, null);
-INSERT INTO `t_config_item` (`biz_id`, `p_biz_id`, `name`, `code`, `data`, `sort_id`,`remark`) VALUES ('12', '1', '3H-12H', '3,12', '180', 2, null);
-INSERT INTO `t_config_item` (`biz_id`, `p_biz_id`, `name`, `code`, `data`, `sort_id`,`remark`) VALUES ('13', '1', '12H-3D', '12,72', '900', 3, null);
-INSERT INTO `t_config_item` (`biz_id`, `p_biz_id`, `name`, `code`, `data`, `sort_id`,`remark`) VALUES ('14', '1', '3D-10D', '72,240', '2700', 4, null);
+INSERT INTO `t_config_item` (`biz_id`, `p_biz_id`, `name`, `code`, `data`, `sort_id`,`remark`) VALUES ('11', '1', '0-3H', '0,3', '60', 1, NULL);
+INSERT INTO `t_config_item` (`biz_id`, `p_biz_id`, `name`, `code`, `data`, `sort_id`,`remark`) VALUES ('12', '1', '3H-12H', '3,12', '180', 2, NULL);
+INSERT INTO `t_config_item` (`biz_id`, `p_biz_id`, `name`, `code`, `data`, `sort_id`,`remark`) VALUES ('13', '1', '12H-3D', '12,72', '900', 3, NULL);
+INSERT INTO `t_config_item` (`biz_id`, `p_biz_id`, `name`, `code`, `data`, `sort_id`,`remark`) VALUES ('14', '1', '3D-10D', '72,240', '2700', 4, NULL);
+
+CREATE TABLE `t_monitor_item_close`
+(
+    `user_id`     varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '用户ID',
+    `item_biz_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '关闭的监控项ID'
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;

@@ -49,6 +49,8 @@ func monitorItemRouters() {
 	group := Router.Group(pathPrefix + "monitorItem/")
 	{
 		group.GET("/getMonitorItemByProductBizId", monitorItemCtl.GetMonitorItemByProductBizId)
+		group.GET("/getAllMonitorItemByProductBizId", monitorItemCtl.GetAllMonitorItemByProductBizId)
+		group.POST("/ChangeMonitorItemDisplay", monitorItemCtl.ChangeMonitorItemDisplay)
 	}
 }
 

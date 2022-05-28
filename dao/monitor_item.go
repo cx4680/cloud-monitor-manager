@@ -19,7 +19,27 @@ type MonitorItemDao struct {
 
 var MonitorItem = new(MonitorItemDao)
 
-func (d *MonitorItemDao) GetMonitorItem(productBizId, osType, display string) []model.MonitorItem {
+func (d *MonitorItemDao) GetMonitorItem(productBizId, osType, display, userId string) []model.MonitorItem {
+	var monitorItemList []model.MonitorItem
+	if strutil.IsNotBlank(display) {
+		global.DB.Where("status = ? AND is_display = ? AND product_biz_id = ? AND display LIKE ? AND biz_id NOT IN (SELECT item_biz_id FROM t_monitor_item_close WHERE user_id = ?)", "1", "1", productBizId, "%"+display+"%", userId).Find(&monitorItemList)
+	} else {
+		global.DB.Where("status = ? AND is_display = ? AND product_biz_id = ? AND biz_id NOT IN (SELECT item_biz_id FROM t_monitor_item_close WHERE user_id = ?)", "1", "1", productBizId, userId).Find(&monitorItemList)
+	}
+	if strutil.IsBlank(osType) {
+		return monitorItemList
+	}
+	var newMonitorItemList []model.MonitorItem
+	for _, v := range monitorItemList {
+		if strutil.IsNotBlank(v.ShowExpression) && !isShow(v.ShowExpression, osType) {
+			continue
+		}
+		newMonitorItemList = append(newMonitorItemList, v)
+	}
+	return newMonitorItemList
+}
+
+func (d *MonitorItemDao) GetAllMonitorItem(productBizId, osType, display string) []model.MonitorItem {
 	var monitorItemList []model.MonitorItem
 	if strutil.IsNotBlank(display) {
 		global.DB.Where("status = ? AND is_display = ? AND product_biz_id = ? AND display LIKE ?", "1", "1", productBizId, "%"+display+"%").Find(&monitorItemList)
@@ -37,6 +57,20 @@ func (d *MonitorItemDao) GetMonitorItem(productBizId, osType, display string) []
 		newMonitorItemList = append(newMonitorItemList, v)
 	}
 	return newMonitorItemList
+}
+
+func (d *MonitorItemDao) CloseMonitorItem(monitorItems []model.MonitorItemClose) {
+	global.DB.Create(monitorItems)
+}
+
+func (d *MonitorItemDao) OpenMonitorItem(monitorItems []string) {
+	global.DB.Where("item_biz_id IN (?)", monitorItems).Delete(&model.MonitorItemClose{})
+}
+
+func (d *MonitorItemDao) GetCloseMonitorItem(userId string) []model.MonitorItemClose {
+	var list []model.MonitorItemClose
+	global.DB.Where("user_id = ?", userId).Find(&list)
+	return list
 }
 
 func (d *MonitorItemDao) GetMonitorItemCacheByMetricCode(metricCode string) form.MonitorItem {
