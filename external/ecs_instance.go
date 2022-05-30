@@ -68,7 +68,7 @@ type EcsAdditional struct {
 
 func (ecs *EcsInstanceService) ConvertRealForm(f service.InstancePageForm) interface{} {
 	param := EcsRequest{
-		CloudProductCode: f.Product,
+		CloudProductCode: "ECS",
 		ResourceTypeCode: "instance",
 		ResourceId:       f.InstanceId,
 		Name:             f.InstanceName,
@@ -116,8 +116,11 @@ func (ecs *EcsInstanceService) ConvertResp(realResp interface{}) (int, []service
 }
 
 func toStringList(s string) []string {
-	statusList := strings.Split(s, ",")
 	var list []string
+	if len(s) == 0 {
+		return list
+	}
+	statusList := strings.Split(s, ",")
 	for _, v := range statusList {
 		list = append(list, v)
 	}

@@ -85,5 +85,5 @@ func NewResCommonPage(c *gin.Context, pageVo *form.PageVO) *ResCommonPage {
 
 func OpenApiRouter(c *gin.Context) bool {
 	uri := c.Request.RequestURI
-	return strings.HasPrefix(uri, "/openapi/")
+	return !strings.HasPrefix(uri, "/api/cmm/")
 }
