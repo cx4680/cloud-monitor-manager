@@ -5,7 +5,6 @@ type MonitorItemParam struct {
 	OsType          string   `form:"osType"`
 	Display         string   `form:"display"`
 	MonitorItemList []string `form:"monitorItemList"`
-	Active          string   `form:"active"`
 }
 
 type MonitorItem struct {

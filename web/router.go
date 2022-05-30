@@ -50,7 +50,7 @@ func monitorItemRouters() {
 	{
 		group.GET("/getMonitorItemByProductBizId", monitorItemCtl.GetMonitorItemByProductBizId)
 		group.GET("/getAllMonitorItemByProductBizId", monitorItemCtl.GetAllMonitorItemByProductBizId)
-		group.POST("/ChangeMonitorItemDisplay", monitorItemCtl.ChangeMonitorItemDisplay)
+		group.POST("/openDisplay", monitorItemCtl.OpenDisplay)
 	}
 }
 

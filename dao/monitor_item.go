@@ -67,12 +67,6 @@ func (d *MonitorItemDao) OpenMonitorItem(monitorItems []string) {
 	global.DB.Where("item_biz_id IN (?)", monitorItems).Delete(&model.MonitorItemClose{})
 }
 
-func (d *MonitorItemDao) GetCloseMonitorItem(userId string) []model.MonitorItemClose {
-	var list []model.MonitorItemClose
-	global.DB.Where("user_id = ?", userId).Find(&list)
-	return list
-}
-
 func (d *MonitorItemDao) GetMonitorItemCacheByMetricCode(metricCode string) form.MonitorItem {
 	value, err := sys_redis.Get("cloudMonitorManager-" + metricCode)
 	if err != nil {

@@ -2,11 +2,9 @@ package service
 
 import (
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/dao"
-	"code.cestc.cn/ccos-ops/cloud-monitor-manager/errors"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/form"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/model"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/util"
-	"code.cestc.cn/ccos-ops/cloud-monitor-manager/util/strutil"
 )
 
 type MonitorItemService struct {
@@ -27,26 +25,23 @@ func (s *MonitorItemService) GetAllMonitorItemByProductBizId(param form.MonitorI
 	return s.dao.GetAllMonitorItem(param.ProductBizId, param.OsType, param.Display)
 }
 
-func (s *MonitorItemService) ChangeMonitorItemDisplay(param form.MonitorItemParam, userId string) error {
-	if len(param.MonitorItemList) == 0 {
-		return errors.NewBusinessError("监控项不能为空")
+func (s *MonitorItemService) OpenDisplay(param form.MonitorItemParam, userId string) error {
+	newMonitorItemMap := make(map[string]int)
+	for _, v := range param.MonitorItemList {
+		newMonitorItemMap[v] = 1
 	}
-	OldMonitorItemMap := make(map[string]int)
-	for _, v := range dao.MonitorItem.GetCloseMonitorItem(userId) {
-		OldMonitorItemMap[v.ItemBizId] = 1
+	monitorItemList := dao.MonitorItem.GetAllMonitorItem(param.ProductBizId, "", "")
+	var closeList []model.MonitorItemClose
+	var allBizId []string
+	for _, v := range monitorItemList {
+		allBizId = append(allBizId, v.BizId)
+		if newMonitorItemMap[v.BizId] != 1 {
+			closeList = append(closeList, model.MonitorItemClose{UserId: userId, ItemBizId: v.BizId})
+		}
 	}
-	var newMonitorItemMap []model.MonitorItemClose
-	if param.Active == "close" {
-		for _, v := range param.MonitorItemList {
-			if strutil.IsNotBlank(v) && OldMonitorItemMap[v] == 0 {
-				newMonitorItemMap = append(newMonitorItemMap, model.MonitorItemClose{UserId: userId, ItemBizId: v})
-			}
-		}
-		if len(newMonitorItemMap) > 0 {
-			s.dao.CloseMonitorItem(newMonitorItemMap)
-		}
-	} else if param.Active == "open" {
-		s.dao.OpenMonitorItem(param.MonitorItemList)
+	s.dao.OpenMonitorItem(allBizId)
+	if len(closeList) > 0 {
+		s.dao.CloseMonitorItem(closeList)
 	}
 	return nil
 }
