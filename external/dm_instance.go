@@ -7,30 +7,29 @@ import (
 	"strconv"
 )
 
-type EcsInstanceService struct {
+type DmInstanceService struct {
 	service.InstanceServiceImpl
 }
 
-type EcsAdditional struct {
-	SystemType string `json:"systemType"`
+type DmAdditional struct {
 }
 
-func (ecs *EcsInstanceService) ConvertRealForm(f service.InstancePageForm) interface{} {
+func (s *DmInstanceService) ConvertRealForm(f service.InstancePageForm) interface{} {
 	param := InstanceRequest{
-		CloudProductCode: "ECS",
-		ResourceTypeCode: "instance",
-		ResourceId:       f.InstanceId,
-		Name:             f.InstanceName,
-		RegionCode:       f.RegionCode,
-		TenantId:         f.TenantId,
-		StatusList:       toStringList(f.StatusList),
-		CurrPage:         strconv.Itoa(f.Current),
-		PageSize:         strconv.Itoa(f.PageSize),
+		CloudProductCode: "DM",
+		//ResourceTypeCode: "instance",
+		ResourceId: f.InstanceId,
+		Name:       f.InstanceName,
+		RegionCode: f.RegionCode,
+		TenantId:   f.TenantId,
+		StatusList: toStringList(f.StatusList),
+		CurrPage:   strconv.Itoa(f.Current),
+		PageSize:   strconv.Itoa(f.PageSize),
 	}
 	return param
 }
 
-func (ecs *EcsInstanceService) DoRequest(url string, f interface{}) (interface{}, error) {
+func (s *DmInstanceService) DoRequest(url string, f interface{}) (interface{}, error) {
 	respStr, err := httputil.HttpPostJson(url, f, nil)
 	if err != nil {
 		return nil, err
@@ -40,13 +39,13 @@ func (ecs *EcsInstanceService) DoRequest(url string, f interface{}) (interface{}
 	return resp, nil
 }
 
-func (ecs *EcsInstanceService) ConvertResp(realResp interface{}) (int, []service.InstanceCommonVO) {
+func (s *DmInstanceService) ConvertResp(realResp interface{}) (int, []service.InstanceCommonVO) {
 	response := realResp.(InstanceResponse)
 	var list []service.InstanceCommonVO
 	if response.Data.Total > 0 {
 		for _, d := range response.Data.List {
-			var ecsAdditional = &EcsAdditional{}
-			jsonutil.ToObject(d.Additional, ecsAdditional)
+			var additional = &DmAdditional{}
+			jsonutil.ToObject(d.Additional, additional)
 			list = append(list, service.InstanceCommonVO{
 				InstanceId:   d.ResourceId,
 				InstanceName: d.ResourceName,
@@ -54,9 +53,6 @@ func (ecs *EcsInstanceService) ConvertResp(realResp interface{}) (int, []service
 				Labels: []service.InstanceLabel{{
 					Name:  "status",
 					Value: d.StatusDesc,
-				}, {
-					Name:  "osType",
-					Value: ecsAdditional.SystemType,
 				}},
 			})
 		}
