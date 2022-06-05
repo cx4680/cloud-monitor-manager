@@ -7,23 +7,17 @@ import (
 	"strconv"
 )
 
-type EipInstanceService struct {
+type NatInstanceService struct {
 	service.InstanceServiceImpl
 }
 
-type EipAdditional struct {
-	BandWidth struct {
-		BandwidthId   string `json:"bandwidthId"`
-		BandWidthSize string `json:"BandWidthSize"`
-	} `json:"bandWidth"`
-	BindInstanceId string `json:"bindInstanceId"`
-	EipIpAddress   string `json:"eipIpAddress"`
+type NatAdditional struct {
 }
 
-func (s *EipInstanceService) ConvertRealForm(f service.InstancePageForm) interface{} {
+func (s *NatInstanceService) ConvertRealForm(f service.InstancePageForm) interface{} {
 	param := InstanceRequest{
-		CloudProductCode: f.Product,
-		ResourceTypeCode: "EIP",
+		CloudProductCode: "NAT",
+		ResourceTypeCode: "nat",
 		ResourceId:       f.InstanceId,
 		Name:             f.InstanceName,
 		RegionCode:       f.RegionCode,
@@ -35,7 +29,7 @@ func (s *EipInstanceService) ConvertRealForm(f service.InstancePageForm) interfa
 	return param
 }
 
-func (s *EipInstanceService) DoRequest(url string, f interface{}) (interface{}, error) {
+func (s *NatInstanceService) DoRequest(url string, f interface{}) (interface{}, error) {
 	respStr, err := httputil.HttpPostJson(url, f, nil)
 	if err != nil {
 		return nil, err
@@ -45,12 +39,12 @@ func (s *EipInstanceService) DoRequest(url string, f interface{}) (interface{}, 
 	return resp, nil
 }
 
-func (s *EipInstanceService) ConvertResp(realResp interface{}) (int, []service.InstanceCommonVO) {
+func (s *NatInstanceService) ConvertResp(realResp interface{}) (int, []service.InstanceCommonVO) {
 	response := realResp.(InstanceResponse)
 	var list []service.InstanceCommonVO
 	if response.Data.Total > 0 {
 		for _, d := range response.Data.List {
-			var additional = &EipAdditional{}
+			var additional = &NatAdditional{}
 			jsonutil.ToObject(d.Additional, additional)
 			list = append(list, service.InstanceCommonVO{
 				InstanceId:   d.ResourceId,
@@ -59,15 +53,6 @@ func (s *EipInstanceService) ConvertResp(realResp interface{}) (int, []service.I
 				Labels: []service.InstanceLabel{{
 					Name:  "status",
 					Value: d.StatusDesc,
-				}, {
-					Name:  "eipAddress",
-					Value: additional.EipIpAddress,
-				}, {
-					Name:  "bandWidth",
-					Value: additional.BandWidth.BandWidthSize,
-				}, {
-					Name:  "bindInstanceId",
-					Value: additional.BindInstanceId,
 				}},
 			})
 		}

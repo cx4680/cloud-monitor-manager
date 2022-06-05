@@ -63,14 +63,8 @@ func (d *MonitorItemDao) CloseMonitorItem(monitorItems []model.MonitorItemClose)
 	global.DB.Create(monitorItems)
 }
 
-func (d *MonitorItemDao) OpenMonitorItem(monitorItems []string) {
-	global.DB.Where("item_biz_id IN (?)", monitorItems).Delete(&model.MonitorItemClose{})
-}
-
-func (d *MonitorItemDao) GetCloseMonitorItem(userId string) []model.MonitorItemClose {
-	var list []model.MonitorItemClose
-	global.DB.Where("user_id = ?", userId).Find(&list)
-	return list
+func (d *MonitorItemDao) OpenMonitorItem(userId string, monitorItems []string) {
+	global.DB.Where("user_id = ? AND item_biz_id IN (?)", userId, monitorItems).Delete(&model.MonitorItemClose{})
 }
 
 func (d *MonitorItemDao) GetMonitorItemCacheByMetricCode(metricCode string) form.MonitorItem {

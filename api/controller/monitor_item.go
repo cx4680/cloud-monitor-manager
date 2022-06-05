@@ -54,21 +54,21 @@ func (mic *MonitorItemCtl) GetAllMonitorItemByProductBizId(c *gin.Context) {
 	c.JSON(http.StatusOK, global.NewSuccess("查询成功", mic.service.GetAllMonitorItemByProductBizId(param)))
 }
 
-func (mic *MonitorItemCtl) ChangeMonitorItemDisplay(c *gin.Context) {
+func (mic *MonitorItemCtl) OpenDisplay(c *gin.Context) {
 	var param form.MonitorItemParam
 	if err := c.ShouldBindJSON(&param); err != nil {
 		c.JSON(http.StatusBadRequest, global.NewError(translate.GetErrorMsg(err)))
 		return
 	}
-	if strutil.IsBlank(param.Active) {
-		c.JSON(http.StatusBadRequest, global.NewError("active不能为空"))
+	if strutil.IsBlank(param.ProductBizId) {
+		c.JSON(http.StatusBadRequest, global.NewError("productBizId不能为空"))
 	}
 	userId, err := util.GetUserId(c)
 	if err != nil {
 		c.JSON(http.StatusOK, global.NewError(err.Error()))
 		return
 	}
-	if err := mic.service.ChangeMonitorItemDisplay(param, userId); err != nil {
+	if err := mic.service.OpenDisplay(param, userId); err != nil {
 		c.JSON(http.StatusBadRequest, global.NewError(err.Error()))
 	}
 	c.JSON(http.StatusOK, global.NewSuccess("切换成功", true))
