@@ -39,7 +39,7 @@ func (s *MonitorItemService) OpenDisplay(param form.MonitorItemParam, userId str
 			closeList = append(closeList, model.MonitorItemClose{UserId: userId, ItemBizId: v.BizId})
 		}
 	}
-	s.dao.OpenMonitorItem(allBizId)
+	s.dao.OpenMonitorItem(userId, allBizId)
 	if len(closeList) > 0 {
 		s.dao.CloseMonitorItem(closeList)
 	}
