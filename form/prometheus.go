@@ -6,7 +6,7 @@ type PrometheusRequest struct {
 	Abbreviation string `form:"abbreviation"`
 	Name         string `form:"name"`
 	Instance     string `form:"instance"`
-	TopNum       string `form:"topNum"`
+	TopNum       int    `form:"topNum"`
 	/**
 	 * 瞬时数据查询参数 时间戳
 	 */
