@@ -73,11 +73,19 @@ func (s *MonitorChartService) GetRangeData(request form.PrometheusRequest) (*for
 	return prometheusAxis, nil
 }
 
-func (s *MonitorChartService) GetTopData(request form.PrometheusRequest) ([]form.PrometheusInstance, error) {
-	if strutil.IsBlank(request.Name) {
-		return nil, errors.NewBusinessError("监控指标不能为空")
+func (s *MonitorChartService) GetTopData(request form.PrometheusRequest, instanceIdList []string, monitorItem form.MonitorItem) ([]form.PrometheusInstance, error) {
+	if strutil.IsBlank(monitorItem.Expression) {
+		return nil, errors.NewBusinessError("监控指标不存在")
 	}
-	pql := fmt.Sprintf(constant.TopExpr, request.TopNum, strings.ReplaceAll(dao.MonitorItem.GetMonitorItemCacheByMetricCode(request.Name).Expression, constant.MetricLabel, ""))
+	var pql string
+	if len(instanceIdList) > 0 {
+		for i, v := range instanceIdList {
+			instanceIdList[i] = fmt.Sprintf(constant.TopExpr, "1", strings.ReplaceAll(monitorItem.Expression, constant.MetricLabel, constant.INSTANCE+"='"+v+"'"))
+		}
+		pql = fmt.Sprintf(constant.TopExpr, strconv.Itoa(request.TopNum), strings.Join(instanceIdList, " or "))
+	} else {
+		pql = fmt.Sprintf(constant.TopExpr, strconv.Itoa(request.TopNum), strings.ReplaceAll(monitorItem.Expression, constant.MetricLabel, ""))
+	}
 	result := s.prometheus.Query(pql, request.Time).Data.Result
 	var instanceList []form.PrometheusInstance
 	for i := range result {
@@ -137,12 +145,4 @@ func changeDecimal(value string) string {
 	}
 	v, _ := strconv.ParseFloat(value, 64)
 	return fmt.Sprintf("%.2f", v)
-}
-
-type EcsVo struct {
-	Code    string `json:"code"`
-	Message string `json:"message"`
-	Data    struct {
-		SerialNumber string `json:"serialNumber"`
-	} `json:"data"`
 }
