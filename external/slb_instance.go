@@ -67,7 +67,7 @@ func (s *SlbInstanceService) ConvertResp(realResp interface{}) (int, []service.I
 					Name:  "status",
 					Value: d.StatusDesc,
 				}, {
-					Name:  "address",
+					Name:  "privateIp",
 					Value: additional.Address,
 				}, {
 					Name:  "vpcName",
