@@ -14,7 +14,7 @@ type EipInstanceService struct {
 type EipAdditional struct {
 	BandWidth struct {
 		BandwidthId   string `json:"bandwidthId"`
-		BandWidthSize string `json:"BandWidthSize"`
+		BandWidthSize int    `json:"BandWidthSize"`
 	} `json:"bandWidth"`
 	BindInstanceId string `json:"bindInstanceId"`
 	EipIpAddress   string `json:"eipIpAddress"`
@@ -64,7 +64,7 @@ func (s *EipInstanceService) ConvertResp(realResp interface{}) (int, []service.I
 					Value: additional.EipIpAddress,
 				}, {
 					Name:  "bandWidth",
-					Value: additional.BandWidth.BandWidthSize,
+					Value: strconv.Itoa(additional.BandWidth.BandWidthSize),
 				}, {
 					Name:  "bindInstanceId",
 					Value: additional.BindInstanceId,

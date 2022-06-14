@@ -17,6 +17,11 @@ type PrometheusRequest struct {
 	Start int `form:"start"`
 	End   int `form:"end"`
 	Step  int `form:"step"`
+	/**
+	 * 统计方式
+	 * 聚合函数 sum(求和)  min(最小值)  max (最大值)  avg (平均值)  stddev (标准差)  stdvar (标准差异)  count (计数)
+	 */
+	Statistics string `form:"statistics"`
 }
 
 type PrometheusResponse struct {

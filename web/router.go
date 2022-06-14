@@ -10,11 +10,13 @@ import (
 const pathPrefix = "/api/cmm/"
 
 func loadRouters() {
+	inner()
 	actuatorMapping()
 	monitorProductRouters()
 	monitorItemRouters()
 	instance()
 	monitorChart()
+	reportForm()
 	configItemRouters()
 }
 
@@ -33,6 +35,14 @@ func actuatorMapping() {
 		group.GET("/metrics", func(c *gin.Context) {
 			c.JSON(http.StatusOK, actuator.Metrics())
 		})
+	}
+}
+
+func inner() {
+	monitorChartCtl := controller.NewReportFormController()
+	group := Router.Group(pathPrefix + "inner")
+	{
+		group.POST("/reportForm/getMonitorData", monitorChartCtl.GetMonitorData)
 	}
 }
 
@@ -61,6 +71,15 @@ func monitorChart() {
 		group.GET("/getData", monitorChartCtl.GetData)
 		group.GET("/getRangeData", monitorChartCtl.GetRangeData)
 		group.GET("/getTopData", monitorChartCtl.GetTopData)
+	}
+}
+
+func reportForm() {
+	monitorChartCtl := controller.NewReportFormController()
+	group := Router.Group(pathPrefix + "reportForm/")
+	{
+		group.POST("/getMonitorData", monitorChartCtl.GetMonitorData)
+		group.POST("/export", monitorChartCtl.Export)
 	}
 }
 

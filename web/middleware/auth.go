@@ -4,7 +4,6 @@ import (
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/config"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/global"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/global/openapi"
-	"code.cestc.cn/ccos-ops/cloud-monitor-manager/logger"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/util/jsonutil"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/util/strutil"
 	"encoding/base64"
@@ -15,7 +14,7 @@ import (
 )
 
 //忽略认证的路径列表
-var ignoreList = []string{"/actuator/**"}
+var ignoreList = []string{"/actuator/**", "/api/cmm/inner/reportForm/**"}
 
 func Auth() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -71,7 +70,6 @@ func ParsingAndSetUserInfo(c *gin.Context) error {
 			return err
 		}
 		if strutil.IsNotBlank(string(userInfoDecode)) {
-			logger.Logger().Infof(`userInfo: %s`, string(userInfoDecode))
 			jsonutil.ToObject(string(userInfoDecode), &userMap)
 			if strutil.IsBlank(userMap["staffId"]) {
 				userMap["staffId"] = "0"

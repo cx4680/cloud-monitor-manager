@@ -25,6 +25,10 @@ type SlbAdditional struct {
 		Port         int    `json:"port"`
 		Protocol     string `json:"protocol"`
 	} `json:"listeners"`
+	Eip struct {
+		Name string `json:"name"`
+		Ip   string `json:"ip"`
+	} `json:"eip"`
 }
 
 func (s *SlbInstanceService) ConvertRealForm(f service.InstancePageForm) interface{} {
@@ -81,6 +85,9 @@ func (s *SlbInstanceService) ConvertResp(realResp interface{}) (int, []service.I
 				}, {
 					Name:  "listener",
 					Value: getListenerList(additional),
+				}, {
+					Name:  "eipIp",
+					Value: additional.Eip.Ip,
 				}},
 			})
 		}

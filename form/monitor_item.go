@@ -13,4 +13,5 @@ type MonitorItem struct {
 	Expression          string `gorm:"column:metric_linux" json:"expression"`
 	Labels              string `gorm:"column:labels" json:"labels"`
 	Code                string `gorm:"column:metric_name" json:"itemCode"`
+	Name                string `gorm:"column:item_name" json:"itemName"`
 }
