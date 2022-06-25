@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"code.cestc.cn/ccos-ops/cloud-monitor-manager/config"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/external"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/global"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/logger"
@@ -23,6 +24,7 @@ func (ctl *InstanceCtl) GetPage(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, global.NewError(translate.GetErrorMsg(err)))
 		return
 	}
+	f.RegionCode = config.Cfg.Common.RegionName
 	instanceService := external.ProductInstanceServiceMap[f.Product]
 	if instanceService == nil {
 		c.JSON(http.StatusBadRequest, global.NewError("该产品未接入"))
