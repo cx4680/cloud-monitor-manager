@@ -22,8 +22,8 @@ type EipAdditional struct {
 
 func (s *EipInstanceService) ConvertRealForm(f service.InstancePageForm) interface{} {
 	param := InstanceRequest{
-		CloudProductCode: f.Product,
-		ResourceTypeCode: "EIP",
+		CloudProductCode: "EIP",
+		ResourceTypeCode: "eip",
 		ResourceId:       f.InstanceId,
 		Name:             f.InstanceName,
 		RegionCode:       f.RegionCode,
