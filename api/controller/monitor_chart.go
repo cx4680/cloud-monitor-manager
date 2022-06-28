@@ -24,14 +24,14 @@ func NewMonitorChartController() *MonitorChartCtl {
 	}
 }
 
-func (mpc *MonitorChartCtl) GetData(c *gin.Context) {
+func (ctl *MonitorChartCtl) GetData(c *gin.Context) {
 	var param form.PrometheusRequest
 	err := c.ShouldBindQuery(&param)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, global.NewError(translate.GetErrorMsg(err)))
 		return
 	}
-	data, err := mpc.service.GetData(param)
+	data, err := ctl.service.GetData(param)
 	if err == nil {
 		c.JSON(http.StatusOK, global.NewSuccess("查询成功", data))
 	} else {
@@ -39,14 +39,14 @@ func (mpc *MonitorChartCtl) GetData(c *gin.Context) {
 	}
 }
 
-func (mpc *MonitorChartCtl) GetRangeData(c *gin.Context) {
+func (ctl *MonitorChartCtl) GetRangeData(c *gin.Context) {
 	var param = form.PrometheusRequest{Step: 60}
 	err := c.ShouldBindQuery(&param)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, global.NewError(translate.GetErrorMsg(err)))
 		return
 	}
-	data, err := mpc.service.GetRangeData(param)
+	data, err := ctl.service.GetRangeData(param)
 	if err == nil {
 		c.JSON(http.StatusOK, global.NewSuccess("查询成功", data))
 	} else {
@@ -54,7 +54,7 @@ func (mpc *MonitorChartCtl) GetRangeData(c *gin.Context) {
 	}
 }
 
-func (mpc *MonitorChartCtl) GetTopData(c *gin.Context) {
+func (ctl *MonitorChartCtl) GetTopData(c *gin.Context) {
 	var param = form.PrometheusRequest{TopNum: 5}
 	err := c.ShouldBindQuery(&param)
 	if err != nil {
@@ -78,7 +78,7 @@ func (mpc *MonitorChartCtl) GetTopData(c *gin.Context) {
 			return
 		}
 	}
-	data, err := mpc.service.GetTopData(param, instanceIdList, monitorItem)
+	data, err := ctl.service.GetTopData(param, instanceIdList, monitorItem)
 	if err == nil {
 		c.JSON(http.StatusOK, global.NewSuccess("查询成功", data))
 	} else {

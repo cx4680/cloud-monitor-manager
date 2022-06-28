@@ -17,7 +17,7 @@ type ReportFormParam struct {
 	Statistics []string `form:"statistics" json:"statistics"`
 	Current    int      `form:"current" json:"current"`
 	PageSize   int      `form:"pageSize" json:"pageSize"`
-	Region     string   `form:"region" json:"region"`
+	RegionCode string   `form:"regionCode" json:"regionCode"`
 }
 
 type InstanceForm struct {

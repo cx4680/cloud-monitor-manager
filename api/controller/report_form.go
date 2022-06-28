@@ -30,7 +30,7 @@ func (mrc *ReportFormCtl) GetMonitorData(c *gin.Context) {
 	}
 	var param = form.ReportFormParam{Step: 60}
 	jsonutil.ToObject(callback.Param, &param)
-	param.Region = config.Cfg.Common.RegionName
+	param.RegionCode = config.Cfg.Common.RegionName
 	if len(param.InstanceList) == 0 {
 		c.JSON(http.StatusBadRequest, global.NewError("实例不能为空"))
 		return
@@ -75,7 +75,7 @@ func (mrc *ReportFormCtl) Export(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, global.NewError("时间参数有误"))
 		return
 	}
-
+	param.RegionCode = config.Cfg.Common.RegionName
 	err = mrc.service.Export(param, c.Request.Header.Get("user-info"))
 	if err == nil {
 		c.JSON(http.StatusOK, global.NewSuccess("导入任务已下发", true))

@@ -39,10 +39,10 @@ func actuatorMapping() {
 }
 
 func inner() {
-	monitorChartCtl := controller.NewReportFormController()
+	reportFormCtl := controller.NewReportFormController()
 	group := Router.Group(pathPrefix + "inner")
 	{
-		group.POST("/reportForm/getMonitorData", monitorChartCtl.GetMonitorData)
+		group.POST("/reportForm/getMonitorData", reportFormCtl.GetMonitorData)
 	}
 }
 

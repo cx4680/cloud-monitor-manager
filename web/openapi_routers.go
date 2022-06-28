@@ -9,7 +9,7 @@ func loadOpenApiV1Routers() {
 	group := Router.Group("/v1.0/")
 	monitorProductOpenApiV1Routers(group)
 	monitorItemOpenApiV1Routers(group)
-	monitorReportOpenApiV1Routers(group)
+	monitorChartOpenApiV1Routers(group)
 	resourceOpenApiV1Routers(group)
 }
 
@@ -23,7 +23,7 @@ func monitorItemOpenApiV1Routers(group *gin.RouterGroup) {
 	group.GET("products/:ProductAbbreviation/metrics", monitorItemCtl.GetMonitorItemsByProductAbbr)
 }
 
-func monitorReportOpenApiV1Routers(group *gin.RouterGroup) {
+func monitorChartOpenApiV1Routers(group *gin.RouterGroup) {
 	monitorChartCtl := v1_0.NewMonitorChartController()
 	group.GET("resources/:ResourceId/metrics/:MetricCode/datas", monitorChartCtl.GetMonitorDatas)
 	group.GET("resources/:ResourceId/metrics/:MetricCode/data", monitorChartCtl.GetMonitorData)
