@@ -1,3 +1,6 @@
+# code.cestc.cn/ccos-ops/oplog v1.0.4
+## explicit; go 1.17
+code.cestc.cn/ccos-ops/oplog
 # github.com/cespare/xxhash/v2 v2.1.2
 ## explicit; go 1.11
 github.com/cespare/xxhash/v2

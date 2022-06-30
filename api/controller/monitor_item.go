@@ -7,6 +7,7 @@ import (
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/util"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/util/strutil"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/validator/translate"
+	"code.cestc.cn/ccos-ops/oplog"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -63,6 +64,7 @@ func (mic *MonitorItemCtl) OpenDisplay(c *gin.Context) {
 	if strutil.IsBlank(param.ProductBizId) {
 		c.JSON(http.StatusBadRequest, global.NewError("productBizId不能为空"))
 	}
+	c.Set(oplog.ResourceName, param.ProductBizId)
 	userId, err := util.GetUserId(c)
 	if err != nil {
 		c.JSON(http.StatusOK, global.NewError(err.Error()))

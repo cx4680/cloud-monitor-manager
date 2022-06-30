@@ -3,6 +3,7 @@ module code.cestc.cn/ccos-ops/cloud-monitor-manager
 go 1.17
 
 require (
+	code.cestc.cn/ccos-ops/oplog v1.0.4
 	github.com/gin-gonic/gin v1.7.7
 	github.com/go-playground/locales v0.14.0
 	github.com/go-playground/universal-translator v0.18.0
