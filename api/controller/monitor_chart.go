@@ -9,6 +9,7 @@ import (
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/service"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/util/strutil"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/validator/translate"
+	"code.cestc.cn/ccos-ops/oplog"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"
@@ -31,6 +32,7 @@ func (ctl *MonitorChartCtl) GetData(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, global.NewError(translate.GetErrorMsg(err)))
 		return
 	}
+	c.Set(oplog.ResourceName, param.Instance)
 	data, err := ctl.service.GetData(param)
 	if err == nil {
 		c.JSON(http.StatusOK, global.NewSuccess("查询成功", data))
@@ -46,6 +48,7 @@ func (ctl *MonitorChartCtl) GetRangeData(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, global.NewError(translate.GetErrorMsg(err)))
 		return
 	}
+	c.Set(oplog.ResourceName, param.Instance)
 	data, err := ctl.service.GetRangeData(param)
 	if err == nil {
 		c.JSON(http.StatusOK, global.NewSuccess("查询成功", data))
