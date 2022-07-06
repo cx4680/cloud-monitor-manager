@@ -78,7 +78,7 @@ func monitorProductRouters() {
 	monitorProductCtl := controller.NewMonitorProductCtl()
 	group := Router.Group(pathPrefix + "monitorProduct/")
 	{
-		group.GET("/getMonitorProduct", oplog.GinTrail(NewV1OperatorInfo("GetAllMonitorProductsList", "获取监控云产品列表", RequestTypeRead, oplog.INFO)), monitorProductCtl.GetMonitorProduct)
+		group.GET("/getMonitorProduct", oplog.GinTrail(NewV1OperatorInfo("GetMonitorProductsList", "获取监控云产品列表", RequestTypeRead, oplog.INFO)), monitorProductCtl.GetMonitorProduct)
 	}
 }
 
@@ -87,7 +87,7 @@ func monitorItemRouters() {
 	group := Router.Group(pathPrefix + "monitorItem/")
 	{
 		group.GET("/getMonitorItemByProductBizId", oplog.GinTrail(NewV1OperatorInfo("GetMonitorItemsByIdList", "获取显示的监控项列表", RequestTypeRead, oplog.INFO)), monitorItemCtl.GetMonitorItemByProductBizId)
-		group.GET("/getAllMonitorItemByProductBizId", oplog.GinTrail(NewV1OperatorInfo("GetAllMonitorItemsByIdList", "获取去产品的所有监控项列表", RequestTypeRead, oplog.INFO)), monitorItemCtl.GetAllMonitorItemByProductBizId)
+		group.GET("/getAllMonitorItemByProductBizId", oplog.GinTrail(NewV1OperatorInfo("GetAllMonitorItemsByIdList", "获取产品的所有监控项列表", RequestTypeRead, oplog.INFO)), monitorItemCtl.GetAllMonitorItemByProductBizId)
 		group.POST("/openDisplay", oplog.GinTrail(NewV1OperatorInfo("OpenDisplay", "显示监控项", RequestTypeWrite, oplog.Warn)), monitorItemCtl.OpenDisplay)
 	}
 }
@@ -96,9 +96,9 @@ func monitorChart() {
 	monitorChartCtl := controller.NewMonitorChartController()
 	group := Router.Group(pathPrefix + "monitorChart/")
 	{
-		group.GET("/getData", oplog.GinTrail(NewV1OperatorInfo("GetMonitorReportData", "获取监控数据", RequestTypeRead, oplog.INFO)), monitorChartCtl.GetData)
-		group.GET("/getRangeData", oplog.GinTrail(NewV1OperatorInfo("GetMonitorReportRangeData", "获取监控图表数据", RequestTypeRead, oplog.INFO)), monitorChartCtl.GetRangeData)
-		group.GET("/getTopData", oplog.GinTrail(NewV1OperatorInfo("GetMonitorReportTop", "获取监控Top数据", RequestTypeRead, oplog.INFO)), monitorChartCtl.GetTopData)
+		group.GET("/getData", oplog.GinTrail(NewV1OperatorInfo("GetMonitorChartData", "获取瞬时监控数据", RequestTypeRead, oplog.INFO)), monitorChartCtl.GetData)
+		group.GET("/getRangeData", oplog.GinTrail(NewV1OperatorInfo("GetMonitorChartRangeData", "获取区间监控数据", RequestTypeRead, oplog.INFO)), monitorChartCtl.GetRangeData)
+		group.GET("/getTopData", oplog.GinTrail(NewV1OperatorInfo("GetMonitorChartTop", "获取监控Top数据", RequestTypeRead, oplog.INFO)), monitorChartCtl.GetTopData)
 	}
 }
 
@@ -106,8 +106,8 @@ func reportForm() {
 	monitorChartCtl := controller.NewReportFormController()
 	group := Router.Group(pathPrefix + "reportForm/")
 	{
-		group.POST("/getMonitorData", monitorChartCtl.GetMonitorData)
-		group.POST("/export", monitorChartCtl.Export)
+		group.POST("/getMonitorData", oplog.GinTrail(NewV1OperatorInfo("GetMonitorData", "获取报表导出数据", RequestTypeRead, oplog.INFO)), monitorChartCtl.GetMonitorData)
+		group.POST("/export", oplog.GinTrail(NewV1OperatorInfo("Export", "报表导出", RequestTypeRead, oplog.INFO)), monitorChartCtl.Export)
 	}
 }
 
