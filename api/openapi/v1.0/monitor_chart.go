@@ -25,7 +25,7 @@ func NewMonitorChartController() *MonitorChartCtl {
 	return &MonitorChartCtl{service.NewMonitorChartService()}
 }
 
-func (mpc *MonitorChartCtl) GetMonitorDatas(c *gin.Context) {
+func (ctl *MonitorChartCtl) GetMonitorDatas(c *gin.Context) {
 	resourceId := c.Param("ResourceId")
 	metricCode := c.Param("MetricCode")
 	var param = MonitorDataParam{Step: 60}
@@ -71,7 +71,7 @@ func (mpc *MonitorChartCtl) GetMonitorDatas(c *gin.Context) {
 	c.JSON(http.StatusOK, result)
 }
 
-func (mpc *MonitorChartCtl) GetMonitorData(c *gin.Context) {
+func (ctl *MonitorChartCtl) GetMonitorData(c *gin.Context) {
 	resourceId := c.Param("ResourceId")
 	metricCode := c.Param("MetricCode")
 	c.Set(global.ResourceName, resourceId)
@@ -97,7 +97,7 @@ func (mpc *MonitorChartCtl) GetMonitorData(c *gin.Context) {
 	c.JSON(http.StatusOK, result)
 }
 
-func (mpc *MonitorChartCtl) GetMonitorDataTop(c *gin.Context) {
+func (ctl *MonitorChartCtl) GetMonitorDataTop(c *gin.Context) {
 	metricCode := c.Param("MetricCode")
 	n := c.Param("N")
 	i, err := strconv.Atoi(n)

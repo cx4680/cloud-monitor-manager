@@ -14,7 +14,7 @@ type EipInstanceService struct {
 type EipAdditional struct {
 	BandWidth struct {
 		BandwidthId   string `json:"bandwidthId"`
-		BandWidthSize string `json:"BandWidthSize"`
+		BandWidthSize int    `json:"BandWidthSize"`
 	} `json:"bandWidth"`
 	BindInstanceId string `json:"bindInstanceId"`
 	EipIpAddress   string `json:"eipIpAddress"`
@@ -22,8 +22,8 @@ type EipAdditional struct {
 
 func (s *EipInstanceService) ConvertRealForm(f service.InstancePageForm) interface{} {
 	param := InstanceRequest{
-		CloudProductCode: f.Product,
-		ResourceTypeCode: "EIP",
+		CloudProductCode: "EIP",
+		ResourceTypeCode: "eip",
 		ResourceId:       f.InstanceId,
 		Name:             f.InstanceName,
 		RegionCode:       f.RegionCode,
@@ -64,7 +64,7 @@ func (s *EipInstanceService) ConvertResp(realResp interface{}) (int, []service.I
 					Value: additional.EipIpAddress,
 				}, {
 					Name:  "bandWidth",
-					Value: additional.BandWidth.BandWidthSize,
+					Value: strconv.Itoa(additional.BandWidth.BandWidthSize),
 				}, {
 					Name:  "bindInstanceId",
 					Value: additional.BindInstanceId,

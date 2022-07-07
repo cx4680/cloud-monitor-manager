@@ -20,11 +20,12 @@ type AppConfig struct {
 }
 
 type CommonConfig struct {
-	Env        string `yaml:"env"`
-	EnvType    string `yaml:"envType"`
-	Nk         string `yaml:"nk"`
-	RegionName string `yaml:"regionName"`
-	Rc         string `yaml:"rc"`
+	Env            string `yaml:"env"`
+	EnvType        string `yaml:"envType"`
+	Nk             string `yaml:"nk"`
+	RegionName     string `yaml:"regionName"`
+	Rc             string `yaml:"rc"`
+	AsyncExportApi string `yaml:"asyncExportApi"`
 }
 
 type Serve struct {
@@ -96,10 +97,11 @@ func defaultAppConfig() AppConfig {
 			ServiceName:   "cloud-monitor-region",
 		},
 		Common: CommonConfig{
-			Env:        "local",
-			Nk:         "",
-			RegionName: uuid.New().String(),
-			Rc:         "",
+			Env:            "local",
+			Nk:             "",
+			RegionName:     uuid.New().String(),
+			Rc:             "",
+			AsyncExportApi: "",
 		},
 	}
 }

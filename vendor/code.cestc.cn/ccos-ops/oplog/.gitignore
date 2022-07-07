@@ -1,0 +1,10 @@
+*#
+.#*
+
+*.exe
+/.idea
+/.vscode
+
+
+/vendor
+/.build
