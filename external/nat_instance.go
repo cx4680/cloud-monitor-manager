@@ -17,7 +17,7 @@ type NatAdditional struct {
 func (s *NatInstanceService) ConvertRealForm(f service.InstancePageForm) interface{} {
 	param := InstanceRequest{
 		CloudProductCode: "NAT",
-		ResourceTypeCode: "nat",
+		ResourceTypeCode: "instance",
 		ResourceId:       f.InstanceId,
 		Name:             f.InstanceName,
 		RegionCode:       f.RegionCode,
