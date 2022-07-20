@@ -186,7 +186,7 @@ func getTimeList(start, end, step, firstTime int) []int {
 }
 
 //构建区间监控数据，未采集到数据则补null
-func pointsFillEmptyRangeData(result []form.PrometheusResult, timeList []int, label, resourceId string) []RangePoint {
+func pointsFillEmptyRangeData(result []*form.PrometheusResult, timeList []int, label, resourceId string) []RangePoint {
 	var points []RangePoint
 	if len(result) == 0 {
 		return []RangePoint{}
@@ -211,7 +211,7 @@ func pointsFillEmptyRangeData(result []form.PrometheusResult, timeList []int, la
 }
 
 //构建瞬时监控数据
-func pointsFillEmptyData(result []form.PrometheusResult, label, resourceId string) []Point {
+func pointsFillEmptyData(result []*form.PrometheusResult, label, resourceId string) []Point {
 	var points []Point
 	if len(result) == 0 {
 		return []Point{}
