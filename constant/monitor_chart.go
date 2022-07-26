@@ -5,4 +5,5 @@ const (
 	FILTER      = "device!='tmpfs'"
 	MetricLabel = "$INSTANCE"
 	TopExpr     = "topk(%s,(%s))"
+	PId         = "pid='%s'"
 )

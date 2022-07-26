@@ -2,6 +2,7 @@ package dao
 
 import (
 	"bytes"
+	"code.cestc.cn/ccos-ops/cloud-monitor-manager/constant"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/form"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/global"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/global/sys_component/sys_redis"
@@ -9,6 +10,7 @@ import (
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/model"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/util/jsonutil"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/util/strutil"
+	"fmt"
 	"strconv"
 	"text/template"
 	"time"
@@ -68,7 +70,7 @@ func (d *MonitorItemDao) OpenMonitorItem(userId string, monitorItems []string) {
 }
 
 func (d *MonitorItemDao) GetMonitorItemCacheByMetricCode(metricCode string) form.MonitorItem {
-	value, err := sys_redis.Get("cloudMonitorManager-" + metricCode)
+	value, err := sys_redis.Get(fmt.Sprintf(constant.MonitorItemKey, metricCode))
 	if err != nil {
 		logger.Logger().Error("key=" + metricCode + ", error:" + err.Error())
 	}

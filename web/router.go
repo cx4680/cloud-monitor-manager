@@ -99,6 +99,7 @@ func monitorChart() {
 		group.GET("/getData", oplog.GinTrail(NewV1OperatorInfo("GetMonitorChartData", "获取瞬时监控数据", RequestTypeRead, oplog.INFO)), monitorChartCtl.GetData)
 		group.GET("/getRangeData", oplog.GinTrail(NewV1OperatorInfo("GetMonitorChartRangeData", "获取区间监控数据", RequestTypeRead, oplog.INFO)), monitorChartCtl.GetRangeData)
 		group.GET("/getTopData", oplog.GinTrail(NewV1OperatorInfo("GetMonitorChartTop", "获取监控Top数据", RequestTypeRead, oplog.INFO)), monitorChartCtl.GetTopData)
+		group.GET("/getProcessData", oplog.GinTrail(NewV1OperatorInfo("GetMonitorChartProcessData", "获取进程监控数据", RequestTypeRead, oplog.INFO)), monitorChartCtl.GetProcessData)
 	}
 }
 
