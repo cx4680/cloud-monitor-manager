@@ -1,9 +1,9 @@
 package form
 
 type ReportFormParam struct {
-	Name         string         `form:"name" json:"name"`
-	ItemList     []string       `form:"itemList" json:"itemList"`
-	InstanceList []InstanceForm `form:"instanceList" json:"instanceList"`
+	Name         string          `form:"name" json:"name"`
+	ItemList     []string        `form:"itemList" json:"itemList"`
+	InstanceList []*InstanceForm `form:"instanceList" json:"instanceList"`
 	/**
 	 * 区间数据查询参数 时间戳
 	 */
@@ -55,23 +55,6 @@ type ExportRecordsRequest struct {
 	SheetSeq   int    `json:"sheetSeq"`
 	SheetName  string `json:"sheetName"`
 	SheetParam string `json:"sheetParam"`
-}
-
-type ExportRecordsResponse struct {
-	PageCount int                   `json:"pageCount"`
-	PageSize  int                   `json:"pageSize"`
-	Current   int                   `json:"current"`
-	Result    []ExportRecordsResult `json:"result"`
-}
-
-type ExportRecordsResult struct {
-	BusiId     int64  `json:"busiId"`
-	Module     string `json:"module"`
-	FileName   string `json:"fileName"`
-	CreateDate string `json:"createDate"`
-	FileSuffix string `json:"fileSuffix"`
-	FileStatus string `json:"fileStatus"`
-	FileId     string `json:"fileId"`
 }
 
 type CallbackReportForm struct {

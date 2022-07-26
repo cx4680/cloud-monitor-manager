@@ -70,7 +70,7 @@ func (d *MonitorItemDao) OpenMonitorItem(userId string, monitorItems []string) {
 func (d *MonitorItemDao) GetMonitorItemCacheByMetricCode(metricCode string) form.MonitorItem {
 	value, err := sys_redis.Get("cloudMonitorManager-" + metricCode)
 	if err != nil {
-		logger.Logger().Info("key=" + metricCode + ", error:" + err.Error())
+		logger.Logger().Error("key=" + metricCode + ", error:" + err.Error())
 	}
 	var monitorItemModel = form.MonitorItem{}
 	if strutil.IsNotBlank(value) {

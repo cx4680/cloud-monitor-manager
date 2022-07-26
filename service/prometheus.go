@@ -17,7 +17,7 @@ func NewPrometheusService() *PrometheusService {
 	return &PrometheusService{}
 }
 
-func (s *PrometheusService) Query(pql string, time string) form.PrometheusResponse {
+func (s *PrometheusService) Query(pql string, time string) *form.PrometheusResponse {
 	var cfg = config.Cfg.Prometheus
 	requestUrl := cfg.Url + cfg.Query
 	logger.Logger().Info(requestUrl + pql)
@@ -28,7 +28,7 @@ func (s *PrometheusService) Query(pql string, time string) form.PrometheusRespon
 	return sendRequest(requestUrl, pql)
 }
 
-func (s *PrometheusService) QueryRange(pql string, start string, end string, step string) form.PrometheusResponse {
+func (s *PrometheusService) QueryRange(pql string, start string, end string, step string) *form.PrometheusResponse {
 	var cfg = config.Cfg.Prometheus
 	requestUrl := cfg.Url + cfg.QueryRange
 	logger.Logger().Info(requestUrl + pql)
@@ -36,8 +36,8 @@ func (s *PrometheusService) QueryRange(pql string, start string, end string, ste
 	return sendRequest(requestUrl, pql)
 }
 
-func sendRequest(requestUrl string, pql string) form.PrometheusResponse {
-	var prometheusResponse form.PrometheusResponse
+func sendRequest(requestUrl string, pql string) *form.PrometheusResponse {
+	prometheusResponse := &form.PrometheusResponse{}
 	response, err := httputil.HttpGet(requestUrl + pql)
 	if err != nil {
 		logger.Logger().Errorf("error:%v\n", err)

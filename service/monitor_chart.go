@@ -99,7 +99,7 @@ func (s *MonitorChartService) GetTopData(request form.PrometheusRequest, instanc
 }
 
 //获取区间数的值，为采集到的时间点位设为null
-func valueAxisFillEmptyData(result []form.PrometheusResult, timeList []string, label string, instanceId string) map[string][]string {
+func valueAxisFillEmptyData(result []*form.PrometheusResult, timeList []string, label string, instanceId string) map[string][]string {
 	resultMap := make(map[string][]string)
 	for i := range result {
 		timeMap := map[string]string{}
