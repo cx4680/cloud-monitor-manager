@@ -5,6 +5,7 @@ import (
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/dao"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/errors"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/form"
+	"code.cestc.cn/ccos-ops/cloud-monitor-manager/util"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/util/strutil"
 	"fmt"
 	"strconv"
@@ -48,15 +49,12 @@ func (s *MonitorChartService) GetRangeData(request form.PrometheusRequest) (*for
 	}
 	monitorItem := dao.MonitorItem.GetMonitorItemCacheByMetricCode(request.Name)
 	pql := strings.ReplaceAll(monitorItem.Expression, constant.MetricLabel, constant.INSTANCE+"='"+request.Instance+"',"+constant.FILTER)
+	if strutil.IsNotBlank(request.Pid) {
+		pql = strings.ReplaceAll(monitorItem.Expression, constant.MetricLabel, constant.INSTANCE+"='"+request.Instance+"',"+fmt.Sprintf(constant.PId, request.Pid))
+	}
 	prometheusResponse := s.prometheus.QueryRange(pql, strconv.Itoa(request.Start), strconv.Itoa(request.End), strconv.Itoa(request.Step))
 	result := prometheusResponse.Data.Result
 	labels := strings.Split(monitorItem.Labels, ",")
-	var label string
-	for i := range labels {
-		if labels[i] != "instance" {
-			label = labels[i]
-		}
-	}
 	start := request.Start
 	end := request.End
 	step := request.Step
@@ -68,7 +66,7 @@ func (s *MonitorChartService) GetRangeData(request form.PrometheusRequest) (*for
 	}
 	prometheusAxis := &form.PrometheusAxis{
 		TimeAxis:  timeList,
-		ValueAxis: valueAxisFillEmptyData(result, timeList, label, request.Instance),
+		ValueAxis: valueAxisFillEmptyData(result, timeList, labels, request.Instance),
 	}
 	return prometheusAxis, nil
 }
@@ -98,24 +96,66 @@ func (s *MonitorChartService) GetTopData(request form.PrometheusRequest, instanc
 	return instanceList, nil
 }
 
+func (s *MonitorChartService) GetProcessData(request form.PrometheusRequest) ([]form.ProcessData, error) {
+	if strutil.IsBlank(request.Instance) {
+		return nil, errors.NewBusinessError("instance为空")
+	}
+	if request.Start == 0 || request.End == 0 || request.Start > request.End {
+		return nil, errors.NewBusinessError("时间参数错误")
+	}
+	cpu := dao.MonitorItem.GetMonitorItemCacheByMetricCode("ecs_processes_top5Cpus")
+	mem := dao.MonitorItem.GetMonitorItemCacheByMetricCode("ecs_processes_top5Mems")
+	fd := dao.MonitorItem.GetMonitorItemCacheByMetricCode("ecs_processes_top5Fds")
+	cpuPql := strings.ReplaceAll(cpu.Expression, constant.MetricLabel, constant.INSTANCE+"='"+request.Instance+"',"+constant.FILTER)
+	memPql := strings.ReplaceAll(mem.Expression, constant.MetricLabel, constant.INSTANCE+"='"+request.Instance+"',"+constant.FILTER)
+	fdPql := strings.ReplaceAll(fd.Expression, constant.MetricLabel, constant.INSTANCE+"='"+request.Instance+"',"+constant.FILTER)
+	cpuResponse := s.prometheus.QueryRange(cpuPql, strconv.Itoa(request.Start), strconv.Itoa(request.End), strconv.Itoa(request.Step))
+	memResponse := s.prometheus.QueryRange(memPql, strconv.Itoa(request.Start), strconv.Itoa(request.End), strconv.Itoa(request.Step))
+	fdResponse := s.prometheus.QueryRange(fdPql, strconv.Itoa(request.Start), strconv.Itoa(request.End), strconv.Itoa(request.Step))
+	memMap := make(map[string]*form.PrometheusResult)
+	fdMap := make(map[string]*form.PrometheusResult)
+	for _, v := range memResponse.Data.Result {
+		memMap[v.Metric["pid"]] = v
+	}
+	for _, v := range fdResponse.Data.Result {
+		fdMap[v.Metric["pid"]] = v
+	}
+	var processList []form.ProcessData
+	for _, v := range cpuResponse.Data.Result {
+		process := form.ProcessData{
+			Pid:     v.Metric["pid"],
+			CmdLine: v.Metric["cmd_line"],
+			Name:    getProcessName(v.Metric["cmd_line"]),
+		}
+		if len(v.Values) != 0 {
+			process.Time = util.TimestampToFullTimeFmtStr(int64(v.Values[len(v.Values)-1][0].(float64)))
+			process.Cpu = changeDecimal(v.Values[len(v.Values)-1][1].(string))
+			process.Memory = changeDecimal(memMap[process.Pid].Values[len(memMap[process.Pid].Values)-1][1].(string))
+			process.Openfiles = fdMap[process.Pid].Values[len(fdMap[process.Pid].Values)-1][1].(string)
+		}
+		processList = append(processList, process)
+	}
+	return processList, nil
+}
+
 //获取区间数的值，为采集到的时间点位设为null
-func valueAxisFillEmptyData(result []*form.PrometheusResult, timeList []string, label string, instanceId string) map[string][]string {
+func valueAxisFillEmptyData(result []*form.PrometheusResult, timeList, labels []string, instanceId string) map[string][]string {
 	resultMap := make(map[string][]string)
-	for i := range result {
+	for _, v := range result {
 		timeMap := map[string]string{}
-		for j := range result[i].Values {
-			key := strconv.Itoa(int(result[i].Values[j][0].(float64)))
-			timeMap[key] = result[i].Values[j][1].(string)
+		for _, value := range v.Values {
+			key := strconv.Itoa(int(value[0].(float64)))
+			timeMap[key] = value[1].(string)
 		}
-		var key string
 		var arr []string
-		for k := range timeList {
-			arr = append(arr, changeDecimal(timeMap[timeList[k]]))
+		for _, time := range timeList {
+			arr = append(arr, changeDecimal(timeMap[time]))
 		}
-		if strutil.IsBlank(result[i].Metric[label]) {
-			key = instanceId
-		} else {
-			key = result[i].Metric[label]
+		key := instanceId
+		for _, label := range labels {
+			if label != "instance" && strutil.IsNotBlank(v.Metric[label]) {
+				key = key + " - " + v.Metric[label]
+			}
 		}
 		resultMap[key] = arr
 	}
@@ -145,4 +185,12 @@ func changeDecimal(value string) string {
 	}
 	v, _ := strconv.ParseFloat(value, 64)
 	return fmt.Sprintf("%.2f", v)
+}
+
+func getProcessName(cmdLine string) string {
+	if strutil.IsBlank(cmdLine) {
+		return "unknown"
+	}
+	list := strings.Split(strings.Split(cmdLine, " ")[0], "/")
+	return list[len(list)-1]
 }
