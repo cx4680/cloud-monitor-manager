@@ -1,6 +1,6 @@
 module code.cestc.cn/ccos-ops/cloud-monitor-manager
 
-go 1.17
+go 1.18
 
 require (
 	code.cestc.cn/ccos-ops/oplog v1.0.4
