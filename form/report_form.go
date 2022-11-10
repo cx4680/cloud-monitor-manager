@@ -15,8 +15,6 @@ type ReportFormParam struct {
 	 * 聚合函数 sum(求和)  min(最小值)  max (最大值)  avg (平均值)  stddev (标准差)  stdvar (标准差异)  count (计数)
 	 */
 	Statistics []string `form:"statistics" json:"statistics"`
-	Current    int      `form:"current" json:"current"`
-	PageSize   int      `form:"pageSize" json:"pageSize"`
 	RegionCode string   `form:"regionCode" json:"regionCode"`
 }
 
@@ -46,9 +44,10 @@ type AsyncExportRequest struct {
 }
 
 type AsyncExportParam struct {
-	SheetSeq   int    `json:"sheetSeq"`
-	SheetName  string `json:"sheetName"`
-	SheetParam string `json:"sheetParam"`
+	SheetSeq       int      `json:"sheetSeq"`
+	SheetName      string   `json:"sheetName"`
+	SheetParam     string   `json:"sheetParam"`
+	SheetParamList []string `json:"sheetParamList"`
 }
 
 type ExportRecordsRequest struct {
