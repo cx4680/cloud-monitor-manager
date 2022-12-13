@@ -138,6 +138,11 @@ func (s *MonitorChartService) GetProcessData(request form.PrometheusRequest) ([]
 	return processList, nil
 }
 
+func (s *MonitorChartService) GetPrometheusData(promql string) (*form.PrometheusResponse, error) {
+	prometheusResponse := s.prometheus.Query(promql, "")
+	return prometheusResponse, nil
+}
+
 //获取区间数的值，为采集到的时间点位设为null
 func valueAxisFillEmptyData(result []*form.PrometheusResult, timeList, labels []string, instanceId string) map[string][]string {
 	resultMap := make(map[string][]string)

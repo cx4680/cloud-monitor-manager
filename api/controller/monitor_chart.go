@@ -104,6 +104,20 @@ func (ctl *MonitorChartCtl) GetProcessData(c *gin.Context) {
 	}
 }
 
+func (ctl *MonitorChartCtl) GetPrometheusData(c *gin.Context) {
+	promql := c.Query("promql")
+	if strutil.IsBlank(promql) {
+		c.JSON(http.StatusBadRequest, global.NewError("promql不能为空"))
+		return
+	}
+	data, err := ctl.service.GetPrometheusData(promql)
+	if err == nil {
+		c.JSON(http.StatusOK, global.NewSuccess("查询成功", data))
+	} else {
+		c.JSON(http.StatusOK, global.NewError(err.Error()))
+	}
+}
+
 //获取实例ID列表
 func getInstanceList(product string) ([]string, error) {
 	instanceService := external.ProductInstanceServiceMap[product]

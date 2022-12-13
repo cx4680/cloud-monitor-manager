@@ -67,10 +67,12 @@ func actuatorMapping() {
 }
 
 func inner() {
+	monitorChartCtl := controller.NewMonitorChartController()
 	reportFormCtl := controller.NewReportFormController()
 	instanceCtl := controller.NewInstanceCtl()
 	group := Router.Group(pathPrefix + "inner")
 	{
+		group.GET("/monitorChart/getPrometheusData", monitorChartCtl.GetPrometheusData)
 		group.POST("/reportForm/getMonitorData", reportFormCtl.GetMonitorData)
 		group.GET("/instance/page", instanceCtl.GetPage)
 	}
