@@ -138,8 +138,13 @@ func (s *MonitorChartService) GetProcessData(request form.PrometheusRequest) ([]
 	return processList, nil
 }
 
-func (s *MonitorChartService) GetPrometheusData(promql string) (*form.PrometheusResponse, error) {
-	prometheusResponse := s.prometheus.Query(promql, "")
+func (s *MonitorChartService) GetPrometheusData(param form.PrometheusRequest) (*form.PrometheusResponse, error) {
+	prometheusResponse := s.prometheus.Query(param.Promql, param.Time)
+	return prometheusResponse, nil
+}
+
+func (s *MonitorChartService) GetPrometheusRangeData(param form.PrometheusRequest) (*form.PrometheusResponse, error) {
+	prometheusResponse := s.prometheus.QueryRange(param.Promql, strconv.Itoa(param.Start), strconv.Itoa(param.End), strconv.Itoa(param.Step))
 	return prometheusResponse, nil
 }
 

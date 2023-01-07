@@ -105,12 +105,28 @@ func (ctl *MonitorChartCtl) GetProcessData(c *gin.Context) {
 }
 
 func (ctl *MonitorChartCtl) GetPrometheusData(c *gin.Context) {
-	promql := c.Query("promql")
-	if strutil.IsBlank(promql) {
-		c.JSON(http.StatusBadRequest, global.NewError("promql不能为空"))
+	var param = form.PrometheusRequest{Step: 60}
+	err := c.ShouldBindQuery(&param)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, global.NewError(translate.GetErrorMsg(err)))
 		return
 	}
-	data, err := ctl.service.GetPrometheusData(promql)
+	data, err := ctl.service.GetPrometheusData(param)
+	if err == nil {
+		c.JSON(http.StatusOK, global.NewSuccess("查询成功", data))
+	} else {
+		c.JSON(http.StatusOK, global.NewError(err.Error()))
+	}
+}
+
+func (ctl *MonitorChartCtl) GetPrometheusRangeData(c *gin.Context) {
+	var param = form.PrometheusRequest{Step: 60}
+	err := c.ShouldBindQuery(&param)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, global.NewError(translate.GetErrorMsg(err)))
+		return
+	}
+	data, err := ctl.service.GetPrometheusRangeData(param)
 	if err == nil {
 		c.JSON(http.StatusOK, global.NewSuccess("查询成功", data))
 	} else {

@@ -73,6 +73,7 @@ func inner() {
 	group := Router.Group(pathPrefix + "inner")
 	{
 		group.GET("/monitorChart/getPrometheusData", monitorChartCtl.GetPrometheusData)
+		group.GET("/monitorChart/getPrometheusRangeData", monitorChartCtl.GetPrometheusRangeData)
 		group.POST("/reportForm/getMonitorData", reportFormCtl.GetMonitorData)
 		group.GET("/instance/page", instanceCtl.GetPage)
 	}
