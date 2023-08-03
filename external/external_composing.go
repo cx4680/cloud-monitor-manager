@@ -121,11 +121,11 @@ type InstanceList struct {
 	Status           int    `json:"status"`
 	StatusDesc       string `json:"statusDesc"`
 	Deleted          int    `json:"deleted"`
-	CreateTime       string `json:"createTime"`
-	UpdateTime       string `json:"updateTime"`
+	CreateTime       int    `json:"createTime"`
+	UpdateTime       int    `json:"updateTime"`
 	Additional       string `json:"additional"`
-	ResCreateTime    string `json:"resCreateTime"`
-	ResUpdateTime    string `json:"resUpdateTime"`
+	ResCreateTime    int    `json:"resCreateTime"`
+	ResUpdateTime    int    `json:"resUpdateTime"`
 	Creator          string `json:"creator"`
 	Modifier         string `json:"modifier"`
 }

@@ -13,6 +13,7 @@ type EcsInstanceService struct {
 
 type EcsAdditional struct {
 	SystemType string `json:"systemType"`
+	UpdateTime string `json:"updateTime"`
 }
 
 func (ecs *EcsInstanceService) ConvertRealForm(f service.InstancePageForm) interface{} {
@@ -57,6 +58,9 @@ func (ecs *EcsInstanceService) ConvertResp(realResp interface{}) (int, []service
 				}, {
 					Name:  "osType",
 					Value: ecsAdditional.SystemType,
+				}, {
+					Name:  "updateTime",
+					Value: ecsAdditional.UpdateTime,
 				}},
 			})
 		}

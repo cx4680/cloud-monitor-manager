@@ -17,14 +17,14 @@ type CbrAdditional struct {
 func (s *CbrInstanceService) ConvertRealForm(f service.InstancePageForm) interface{} {
 	param := InstanceRequest{
 		CloudProductCode: "CBR",
-		//ResourceTypeCode: "instance",
-		ResourceId: f.InstanceId,
-		Name:       f.InstanceName,
-		RegionCode: f.RegionCode,
-		TenantId:   f.TenantId,
-		StatusList: toStringList(f.StatusList),
-		CurrPage:   strconv.Itoa(f.Current),
-		PageSize:   strconv.Itoa(f.PageSize),
+		ResourceTypeCode: "Vault",
+		ResourceId:       f.InstanceId,
+		Name:             f.InstanceName,
+		RegionCode:       f.RegionCode,
+		TenantId:         f.TenantId,
+		StatusList:       toStringList(f.StatusList),
+		CurrPage:         strconv.Itoa(f.Current),
+		PageSize:         strconv.Itoa(f.PageSize),
 	}
 	return param
 }

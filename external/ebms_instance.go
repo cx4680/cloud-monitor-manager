@@ -16,15 +16,15 @@ type EbmsAdditional struct {
 
 func (s *EbmsInstanceService) ConvertRealForm(f service.InstancePageForm) interface{} {
 	param := InstanceRequest{
-		CloudProductCode: "EBMS",
-		//ResourceTypeCode: "instance",
-		ResourceId: f.InstanceId,
-		Name:       f.InstanceName,
-		RegionCode: f.RegionCode,
-		TenantId:   f.TenantId,
-		StatusList: toStringList(f.StatusList),
-		CurrPage:   strconv.Itoa(f.Current),
-		PageSize:   strconv.Itoa(f.PageSize),
+		CloudProductCode: "BMS",
+		ResourceTypeCode: "EBMS",
+		ResourceId:       f.InstanceId,
+		Name:             f.InstanceName,
+		RegionCode:       f.RegionCode,
+		TenantId:         f.TenantId,
+		StatusList:       toStringList(f.StatusList),
+		CurrPage:         strconv.Itoa(f.Current),
+		PageSize:         strconv.Itoa(f.PageSize),
 	}
 	return param
 }

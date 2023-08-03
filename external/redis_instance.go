@@ -16,8 +16,8 @@ type RedisAdditional struct {
 
 func (s *RedisInstanceService) ConvertRealForm(f service.InstancePageForm) interface{} {
 	param := InstanceRequest{
-		CloudProductCode: "REDIS",
-		ResourceTypeCode: "instance",
+		CloudProductCode: "NDB",
+		ResourceTypeCode: "redis",
 		ResourceId:       f.InstanceId,
 		Name:             f.InstanceName,
 		RegionCode:       f.RegionCode,
