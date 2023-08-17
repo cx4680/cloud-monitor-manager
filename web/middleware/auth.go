@@ -14,7 +14,7 @@ import (
 )
 
 //忽略认证的路径列表
-var ignoreList = []string{"/actuator/**", "/api/cmm/inner/reportForm/**"}
+var ignoreList = []string{"/actuator/**", "/api/cmm/inner/reportForm/**", "/api/cmm/inner/instance/**"}
 
 func Auth() gin.HandlerFunc {
 	return func(c *gin.Context) {

@@ -68,9 +68,11 @@ func actuatorMapping() {
 
 func inner() {
 	reportFormCtl := controller.NewReportFormController()
+	instanceCtl := controller.NewInstanceCtl()
 	group := Router.Group(pathPrefix + "inner")
 	{
 		group.POST("/reportForm/getMonitorData", reportFormCtl.GetMonitorData)
+		group.GET("/instance/page", instanceCtl.GetPage)
 	}
 }
 
