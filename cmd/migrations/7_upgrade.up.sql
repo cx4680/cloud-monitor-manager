@@ -1,4 +1,4 @@
-UPDATE t_monitor_product SET status = '1' WHERE abbreviation IN ('cbr', 'kafka', 'bms', 'ebms', 'redis', 'mongo', 'cgw', 'mysql', 'dm', 'postgresql');
+UPDATE t_monitor_product SET status = '1' WHERE abbreviation IN ('cbr', 'kafka', 'redis', 'mongo', 'cgw', 'mysql', 'dm', 'postgresql');
 
 INSERT INTO t_monitor_item (metric_name, product_metric_name, name, metric_name, labels, metrics_linux, metrics_windows, statistics, unit, frequency, type, is_display, status, description, create_user, create_time, show_expression, display) VALUES ('197', '1', '(基础)内存使用率', 'ecs_memory_base_usage', 'instance', '(1-sum by(instance,instanceType)(ecs_base_memory_unused_bytes{$INSTANCE})/sum by(instance,instanceType)(ecs_base_memory_available_bytes{$INSTANCE}))*100', null, null, '%', null, '1', '1', '1', null, null, NOW(), null, 'chart');
 
@@ -141,43 +141,7 @@ UPDATE t_monitor_item SET metrics_linux='sum by(instance,instanceType)(kafka_ser
 UPDATE t_monitor_item SET metrics_linux='sum by(instance,instanceType)(kafka_consumergroup_lag{$INSTANCE})' WHERE metric_name='kafka_consumergroup_lag';
 INSERT INTO t_monitor_item (biz_id, product_biz_id, name, metric_name, labels, metrics_linux, metrics_windows, statistics, unit, frequency, type, is_display, status, description, create_user, create_time, show_expression, display) VALUES ('201', '9', '集群磁盘使用量', 'kafka_logdirsusage_partition_usage', 'instance', 'sum by(instance,instanceType)(kafka_logdirsusage_partition_usage{$INSTANCE})', null, null, 'Byte', null, null, '1', '1', null, null, null, null, 'chart');
 
-UPDATE t_monitor_item SET metrics_linux='100 - (100 * (sum by(instance,instanceType)(irate(ecs_cpu_seconds_total{mode="idle",$INSTANCE}[3m])) / sum by(instance,instanceType)(irate(ecs_cpu_seconds_total{$INSTANCE}[3m]))))' WHERE metric_name='bms_cpu_usage';
-UPDATE t_monitor_item SET metrics_linux='sum by(instance,instanceType)(ecs_load1{$INSTANCE})' WHERE metric_name='bms_load1';
-UPDATE t_monitor_item SET metrics_linux='sum by(instance,instanceType)(ecs_load5{$INSTANCE})' WHERE metric_name='bms_load5';
-UPDATE t_monitor_item SET metrics_linux='sum by(instance,instanceType)(ecs_load15{$INSTANCE})' WHERE metric_name='bms_load15';
-UPDATE t_monitor_item SET metrics_linux='sum by(instance,instanceType)(ecs_memory_MemTotal_bytes{$INSTANCE}) - sum by(instance,instanceType)(ecs_memory_MemFree_bytes{$INSTANCE})' WHERE metric_name='bms_memory_used';
-UPDATE t_monitor_item SET metrics_linux = '100 * ((sum by(instance)(ecs_memory_MemTotal_bytes{$INSTANCE}) - (sum by(instance)(ecs_memory_MemFree_bytes{$INSTANCE}) + sum by(instance)(ecs_memory_Cached_bytes{$INSTANCE}))) / sum by(instance)(ecs_memory_MemTotal_bytes{$INSTANCE}))' WHERE metric_name = 'bms_memory_usage';
-UPDATE t_monitor_item SET metrics_linux='100 * ((sum by(instance,instanceType,device)(ecs_filesystem_size_bytes{$INSTANCE}) - sum by(instance,instanceType,device)(ecs_filesystem_free_bytes{$INSTANCE})) / sum by(instance,instanceType,device)(ecs_filesystem_size_bytes{$INSTANCE}))' WHERE metric_name='bms_disk_usage';
-UPDATE t_monitor_item SET metrics_linux='sum by(instance,instanceType,device)(irate(ecs_disk_read_bytes_total{$INSTANCE}[3m]))' WHERE metric_name='bms_disk_read_rate';
-UPDATE t_monitor_item SET metrics_linux='sum by(instance,instanceType,device)(irate(ecs_disk_written_bytes_total{$INSTANCE}[3m]))' WHERE metric_name='bms_disk_write_rate';
-UPDATE t_monitor_item SET metrics_linux='sum by(instance,instanceType,device)(irate(ecs_disk_reads_completed_total{$INSTANCE}[3m]))' WHERE metric_name='bms_disk_read_iops';
-UPDATE t_monitor_item SET metrics_linux='sum by(instance,instanceType,device)(irate(ecs_disk_writes_completed_total{$INSTANCE}[3m]))' WHERE metric_name='bms_disk_write_iops';
-UPDATE t_monitor_item SET metrics_linux='sum by(instance,instanceType,device)(irate(ecs_network_receive_bytes_total{$INSTANCE}[3m])) / 1024 / 1024 * 8' WHERE metric_name='bms_network_receive_rate';
-UPDATE t_monitor_item SET metrics_linux='sum by(instance,instanceType,device)(irate(ecs_network_transmit_bytes_total{$INSTANCE}[3m])) / 1024 / 1024 * 8' WHERE metric_name='bms_network_transmit_rate';
-UPDATE t_monitor_item SET metrics_linux='sum by(instance,instanceType,device)(irate(ecs_network_receive_packets_total{$INSTANCE}[3m]))' WHERE metric_name='bms_network_receive_packets_rate';
-UPDATE t_monitor_item SET metrics_linux='sum by(instance,instanceType,device)(irate(ecs_network_transmit_packets_total{$INSTANCE}[3m]))' WHERE metric_name='bms_network_transmit_packets_rate';
-UPDATE t_monitor_item SET metrics_linux='sum by(instance,instanceType,device)(ecs_filesystem_free_bytes{$INSTANCE})' WHERE metric_name='bms_filesystem_free_bytes';
-UPDATE t_monitor_item SET metrics_linux='sum by(instance,instanceType,device)(ecs_filesystem_size_bytes{$INSTANCE}) - sum by(instance,instanceType,device)(ecs_filesystem_free_bytes{$INSTANCE})' WHERE metric_name='bms_disk_used';
-UPDATE t_monitor_item SET metrics_linux='sum by(instance,instanceType,device)(ecs_filesystem_size_bytes{$INSTANCE})' WHERE metric_name='bms_filesystem_size_bytes';
 
-UPDATE t_monitor_item SET metrics_linux='100 - (100 * (sum by(instance,instanceType)(irate(ecs_cpu_seconds_total{mode="idle",$INSTANCE}[3m])) / sum by(instance,instanceType)(irate(ecs_cpu_seconds_total{$INSTANCE}[3m]))))' WHERE metric_name='ebms_cpu_usage';
-UPDATE t_monitor_item SET metrics_linux='sum by(instance,instanceType)(ecs_load1{$INSTANCE})' WHERE metric_name='ebms_load1';
-UPDATE t_monitor_item SET metrics_linux='sum by(instance,instanceType)(ecs_load5{$INSTANCE})' WHERE metric_name='ebms_load5';
-UPDATE t_monitor_item SET metrics_linux='sum by(instance,instanceType)(ecs_load15{$INSTANCE})' WHERE metric_name='ebms_load15';
-UPDATE t_monitor_item SET metrics_linux='sum by(instance,instanceType)(ecs_memory_MemTotal_bytes{$INSTANCE}) - sum by(instance,instanceType)(ecs_memory_MemFree_bytes{$INSTANCE})' WHERE metric_name='ebms_memory_used';
-UPDATE t_monitor_item SET metrics_linux = '100 * ((sum by(instance)(ecs_memory_MemTotal_bytes{$INSTANCE}) - (sum by(instance)(ecs_memory_MemFree_bytes{$INSTANCE}) + sum by(instance)(ecs_memory_Cached_bytes{$INSTANCE}))) / sum by(instance)(ecs_memory_MemTotal_bytes{$INSTANCE}))' WHERE metric_name = 'ebms_memory_usage';
-UPDATE t_monitor_item SET metrics_linux='100 * ((sum by(instance,instanceType,device)(ecs_filesystem_size_bytes{$INSTANCE}) - sum by(instance,instanceType,device)(ecs_filesystem_free_bytes{$INSTANCE})) / sum by(instance,instanceType,device)(ecs_filesystem_size_bytes{$INSTANCE}))' WHERE metric_name='ebms_disk_usage';
-UPDATE t_monitor_item SET metrics_linux='sum by(instance,instanceType,device)(irate(ecs_disk_read_bytes_total{$INSTANCE}[3m]))' WHERE metric_name='ebms_disk_read_rate';
-UPDATE t_monitor_item SET metrics_linux='sum by(instance,instanceType,device)(irate(ecs_disk_written_bytes_total{$INSTANCE}[3m]))' WHERE metric_name='ebms_disk_write_rate';
-UPDATE t_monitor_item SET metrics_linux='sum by(instance,instanceType,device)(irate(ecs_disk_reads_completed_total{$INSTANCE}[3m]))' WHERE metric_name='ebms_disk_read_iops';
-UPDATE t_monitor_item SET metrics_linux='sum by(instance,instanceType,device)(irate(ecs_disk_writes_completed_total{$INSTANCE}[3m]))' WHERE metric_name='ebms_disk_write_iops';
-UPDATE t_monitor_item SET metrics_linux='sum by(instance,instanceType,device)(irate(ecs_network_receive_bytes_total{$INSTANCE}[3m])) / 1024 / 1024 * 8' WHERE metric_name='ebms_network_receive_rate';
-UPDATE t_monitor_item SET metrics_linux='sum by(instance,instanceType,device)(irate(ecs_network_transmit_bytes_total{$INSTANCE}[3m])) / 1024 / 1024 * 8' WHERE metric_name='ebms_network_transmit_rate';
-UPDATE t_monitor_item SET metrics_linux='sum by(instance,instanceType,device)(irate(ecs_network_receive_packets_total{$INSTANCE}[3m]))' WHERE metric_name='ebms_network_receive_packets_rate';
-UPDATE t_monitor_item SET metrics_linux='sum by(instance,instanceType,device)(irate(ecs_network_transmit_packets_total{$INSTANCE}[3m]))' WHERE metric_name='ebms_network_transmit_packets_rate';
-UPDATE t_monitor_item SET metrics_linux='sum by(instance,instanceType,device)(ecs_filesystem_free_bytes{$INSTANCE})' WHERE metric_name='ebms_filesystem_free_bytes';
-UPDATE t_monitor_item SET metrics_linux='sum by(instance,instanceType,device)(ecs_filesystem_size_bytes{$INSTANCE}) - sum by(instance,instanceType,device)(ecs_filesystem_free_bytes{$INSTANCE})' WHERE metric_name='ebms_disk_used';
-UPDATE t_monitor_item SET metrics_linux='sum by(instance,instanceType,device)(ecs_filesystem_size_bytes{$INSTANCE})' WHERE metric_name='ebms_filesystem_size_bytes';
 
 UPDATE t_monitor_item SET metrics_linux='sum by(instance,instanceType)(redis_cpu_usage{$INSTANCE})' WHERE metric_name='redis_cpu_usage';
 UPDATE t_monitor_item SET metrics_linux='sum by(instance,instanceType)(redis_mem_usage{$INSTANCE})' WHERE metric_name='redis_mem_usage';
