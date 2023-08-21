@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-//已接入的产品简称
+// 已接入的产品简称
 const (
 	ECS        = "ecs"
 	EIP        = "eip"
@@ -46,12 +46,6 @@ var ProductInstanceServiceMap = map[string]service.InstanceService{
 		InstanceServiceImpl: service.InstanceServiceImpl{},
 	},
 	POSTGRESQL: &PgInstanceService{
-		InstanceServiceImpl: service.InstanceServiceImpl{},
-	},
-	BMS: &BmsInstanceService{
-		InstanceServiceImpl: service.InstanceServiceImpl{},
-	},
-	EBMS: &EbmsInstanceService{
 		InstanceServiceImpl: service.InstanceServiceImpl{},
 	},
 	KAFKA: &KafkaInstanceService{
