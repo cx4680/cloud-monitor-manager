@@ -70,7 +70,8 @@ func (d *MonitorItemDao) OpenMonitorItem(userId string, monitorItems []string) {
 }
 
 func (d *MonitorItemDao) GetMonitorItemCacheByMetricCode(metricCode string) form.MonitorItem {
-	value, err := sys_redis.Get(fmt.Sprintf(constant.MonitorItemKey, metricCode))
+	key := fmt.Sprintf(constant.MonitorItemKey, metricCode)
+	value, err := sys_redis.Get(key)
 	if err != nil {
 		logger.Logger().Error("key=" + metricCode + ", error:" + err.Error())
 	}
@@ -84,7 +85,7 @@ func (d *MonitorItemDao) GetMonitorItemCacheByMetricCode(metricCode string) form
 		logger.Logger().Info("获取监控项为空")
 		return monitorItemModel
 	}
-	if e := sys_redis.SetByTimeOut("cloudMonitorManager-"+metricCode, jsonutil.ToString(monitorItemModel), time.Hour); e != nil {
+	if e := sys_redis.SetByTimeOut(key, jsonutil.ToString(monitorItemModel), time.Hour); e != nil {
 		logger.Logger().Error("设置监控项缓存错误, key=" + metricCode)
 	}
 	return monitorItemModel

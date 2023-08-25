@@ -12,19 +12,21 @@ type PgInstanceService struct {
 }
 
 type PgAdditional struct {
+	InstanceMode string `json:"instanceMode"`
+	RdsStateTime string `json:"RdsStateTime"`
 }
 
 func (s *PgInstanceService) ConvertRealForm(f service.InstancePageForm) interface{} {
 	param := InstanceRequest{
-		CloudProductCode: "PG",
-		//ResourceTypeCode: "instance",
-		ResourceId: f.InstanceId,
-		Name:       f.InstanceName,
-		RegionCode: f.RegionCode,
-		TenantId:   f.TenantId,
-		StatusList: toStringList(f.StatusList),
-		CurrPage:   strconv.Itoa(f.Current),
-		PageSize:   strconv.Itoa(f.PageSize),
+		CloudProductCode: "RDB",
+		ResourceTypeCode: "pg",
+		ResourceId:       f.InstanceId,
+		Name:             f.InstanceName,
+		RegionCode:       f.RegionCode,
+		TenantId:         f.TenantId,
+		StatusList:       toStringList(f.StatusList),
+		CurrPage:         strconv.Itoa(f.Current),
+		PageSize:         strconv.Itoa(f.PageSize),
 	}
 	return param
 }
@@ -53,6 +55,12 @@ func (s *PgInstanceService) ConvertResp(realResp interface{}) (int, []service.In
 				Labels: []service.InstanceLabel{{
 					Name:  "status",
 					Value: d.StatusDesc,
+				}, {
+					Name:  "instanceMode",
+					Value: additional.InstanceMode,
+				}, {
+					Name:  "rdsStateTime",
+					Value: additional.RdsStateTime,
 				}},
 			})
 		}

@@ -16,7 +16,7 @@ type KafkaAdditional struct {
 
 func (s *KafkaInstanceService) ConvertRealForm(f service.InstancePageForm) interface{} {
 	param := InstanceRequest{
-		CloudProductCode: "CMQ",
+		CloudProductCode: "CMQK",
 		ResourceTypeCode: "instance",
 		ResourceId:       f.InstanceId,
 		Name:             f.InstanceName,

@@ -12,19 +12,21 @@ type DmInstanceService struct {
 }
 
 type DmAdditional struct {
+	InstanceMode string `json:"instanceMode"`
+	RdsStateTime string `json:"RdsStateTime"`
 }
 
 func (s *DmInstanceService) ConvertRealForm(f service.InstancePageForm) interface{} {
 	param := InstanceRequest{
-		CloudProductCode: "DM",
-		//ResourceTypeCode: "instance",
-		ResourceId: f.InstanceId,
-		Name:       f.InstanceName,
-		RegionCode: f.RegionCode,
-		TenantId:   f.TenantId,
-		StatusList: toStringList(f.StatusList),
-		CurrPage:   strconv.Itoa(f.Current),
-		PageSize:   strconv.Itoa(f.PageSize),
+		CloudProductCode: "RDB",
+		ResourceTypeCode: "dm",
+		ResourceId:       f.InstanceId,
+		Name:             f.InstanceName,
+		RegionCode:       f.RegionCode,
+		TenantId:         f.TenantId,
+		StatusList:       toStringList(f.StatusList),
+		CurrPage:         strconv.Itoa(f.Current),
+		PageSize:         strconv.Itoa(f.PageSize),
 	}
 	return param
 }
@@ -53,6 +55,12 @@ func (s *DmInstanceService) ConvertResp(realResp interface{}) (int, []service.In
 				Labels: []service.InstanceLabel{{
 					Name:  "status",
 					Value: d.StatusDesc,
+				}, {
+					Name:  "instanceMode",
+					Value: additional.InstanceMode,
+				}, {
+					Name:  "rdsStateTime",
+					Value: additional.RdsStateTime,
 				}},
 			})
 		}
