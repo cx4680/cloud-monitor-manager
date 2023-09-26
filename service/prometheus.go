@@ -52,14 +52,33 @@ func (s *PrometheusService) QueryRange(pql string, start string, end string, ste
 	return sendRequest(requestUrl, pql)
 }
 
+func (s *PrometheusService) QueryFrontendRange(pql string, start string, end string, step string) *form.PrometheusResponse {
+	var cfg = config.Cfg.Prometheus
+	requestUrl := cfg.ThanosQueryFrontend + cfg.QueryRange
+	pql = url.QueryEscape(pql) + "&start=" + start + "&end=" + end + "&step=" + step + "&partial_response=false"
+	logger.Logger().Info(requestUrl + pql)
+	return sendRequest(requestUrl, pql)
+}
+
+func (s *PrometheusService) QueryFrontendRangeDownSampling(pql string, start string, end string, step string) *form.PrometheusResponse {
+	var cfg = config.Cfg.Prometheus
+	requestUrl := cfg.ThanosQueryFrontend + cfg.QueryRange
+	pql = url.QueryEscape(pql) + "&start=" + start + "&end=" + end + "&step=" + step + "&partial_response=false&max_source_resolution=1h"
+	logger.Logger().Info(requestUrl + pql)
+	return sendRequest(requestUrl, pql)
+}
+
 func sendRequest(requestUrl string, pql string) *form.PrometheusResponse {
 	prometheusResponse := &form.PrometheusResponse{}
 	response, err := httputil.HttpGet(requestUrl + pql)
 	if err != nil {
-		logger.Logger().Errorf("error:%v\n", err)
+		logger.Logger().Errorf("query prometheus error:%v\n", err)
 		return prometheusResponse
 	}
 	jsonutil.ToObject(response, &prometheusResponse)
+	if prometheusResponse == nil || prometheusResponse.Data == nil || prometheusResponse.Data.Result == nil || len(prometheusResponse.Data.Result) == 0 {
+		logger.Logger().Infof("query prometheus empty, origin response:%s\n", response)
+	}
 	return prometheusResponse
 }
 

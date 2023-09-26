@@ -83,3 +83,22 @@ func (mrc *ReportFormCtl) Export(c *gin.Context) {
 		c.JSON(http.StatusOK, global.NewError(err.Error()))
 	}
 }
+
+func (mrc *ReportFormCtl) GetReportFormData(c *gin.Context) {
+	var param = form.ReportFormParam{Step: 60}
+	err := c.ShouldBindJSON(&param)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, global.NewError(translate.GetErrorMsg(err)))
+		return
+	}
+	for _, v := range param.Instance {
+		param.InstanceList = append(param.InstanceList, &form.InstanceForm{InstanceId: v})
+	}
+	param.Statistics = []string{"max", "min", "avg"}
+	data, err := mrc.service.GetReportFormData(param)
+	if err == nil {
+		c.JSON(http.StatusOK, global.NewSuccess("查询成功", data))
+	} else {
+		c.JSON(http.StatusOK, global.NewError(err.Error()))
+	}
+}

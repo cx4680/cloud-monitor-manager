@@ -16,6 +16,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 )
 
 type ReportFormService struct {
@@ -214,4 +215,91 @@ func (s *ReportFormService) Export(param form.ReportFormParam, userInfo string) 
 		return errors.NewBusinessError("异步导出API调用失败")
 	}
 	return nil
+}
+
+var ecsCpuBaseUsageDownSampling = "100 * avg by(instance,instanceType)(rate(ecs_base_vcpu_seconds{$INSTANCE}[3h]))"
+
+func (s *ReportFormService) GetReportFormData(param form.ReportFormParam) ([]*form.ReportForm, error) {
+	if len(param.InstanceList) == 0 {
+		return nil, errors.NewBusinessError("实例不能为空")
+	}
+	if strutil.IsBlank(param.Item) {
+		return nil, errors.NewBusinessError("指标不能为空")
+	}
+	var instanceList []string
+	instanceMap := make(map[string]*form.InstanceForm)
+	for _, v := range param.InstanceList {
+		instanceList = append(instanceList, v.InstanceId)
+		instanceMap[v.InstanceId] = v
+	}
+	instances := strings.Join(instanceList, "|")
+	item := dao.MonitorItem.GetMonitorItemCacheByMetricCode(param.Item)
+	labels := strings.Split(item.Labels, ",")
+	var downSampling = false
+	if int(time.Now().Unix())-param.Start >= 3024000 {
+		downSampling = true
+		if item.Name == "ecs_cpu_base_usage" {
+			item.Expression = ecsCpuBaseUsageDownSampling
+		}
+	}
+
+	pql := strings.ReplaceAll(item.Expression, constant.MetricLabel, constant.INSTANCE+"=~'"+instances+"'")
+	//获取单个指标的所有实例数据
+	//计算开始时间当天的23时59分59秒
+	start := param.Start + (86400 - (param.Start-57600)%86400)
+	//计算结束时间当天的23时59分59秒
+	end := param.End + (86400 - (param.End-57600)%86400)
+	var result map[string]*form.PrometheusResult
+	var ret = make(map[string]map[string]*form.PrometheusResult)
+	//开启协程
+	group := &sync.WaitGroup{}
+	group.Add(len(param.Statistics))
+	for _, statistics := range param.Statistics {
+		m := make(map[string]*form.PrometheusResult)
+		go func(aggregation, pql string, start, end int, statistics, labels []string, group *sync.WaitGroup, resultMap map[string]*form.PrometheusResult) {
+			defer group.Done()
+			for _, v := range statistics {
+				if aggregation == v {
+					expr := fmt.Sprintf("%s_over_time((%s)[1d:1h])", aggregation, pql)
+					var response *form.PrometheusResponse
+					if downSampling {
+						response = s.prometheus.QueryFrontendRangeDownSampling(expr, strconv.Itoa(start), strconv.Itoa(end), "86400")
+					} else {
+						response = s.prometheus.QueryFrontendRange(expr, strconv.Itoa(start), strconv.Itoa(end), "86400")
+					}
+					if response.Data == nil || response.Data.Result == nil {
+						continue
+					}
+					for _, prometheusResult := range response.Data.Result {
+						key := prometheusResult.Metric["instance"]
+						for _, label := range labels {
+							if label != "instance" && strutil.IsNotBlank(prometheusResult.Metric[label]) {
+								key = key + " - " + prometheusResult.Metric[label]
+							}
+						}
+						resultMap[key] = prometheusResult
+					}
+				}
+			}
+		}(statistics, pql, start, end, param.Statistics, labels, group, m)
+
+		ret[statistics] = m
+		if result == nil {
+			result = m
+		}
+	}
+	group.Wait()
+	var list []*form.ReportForm
+	for k, v := range result {
+		for i := range v.Values {
+			dataMap := make(map[string][]interface{})
+			for calcStyle, d := range ret {
+				dataMap[calcStyle] = d[k].Values[i]
+			}
+			if f := s.buildAggregationReportForm(v.Metric["instance"], k, item.Name, instanceMap, dataMap); f != nil {
+				list = append(list, f)
+			}
+		}
+	}
+	return list, nil
 }
