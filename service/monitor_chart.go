@@ -1,15 +1,16 @@
 package service
 
 import (
+	"fmt"
+	"strconv"
+	"strings"
+
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/constant"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/dao"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/errors"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/form"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/util"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/util/strutil"
-	"fmt"
-	"strconv"
-	"strings"
 )
 
 type MonitorChartService struct {
@@ -143,12 +144,17 @@ func (s *MonitorChartService) GetPrometheusData(param form.PrometheusRequest) (*
 	return prometheusResponse, nil
 }
 
+func (s *MonitorChartService) PostPrometheusData(param form.PrometheusRequest) (*form.PrometheusResponse, error) {
+	prometheusResponse := s.prometheus.PostQuery(param.Promql, param.Time)
+	return prometheusResponse, nil
+}
+
 func (s *MonitorChartService) GetPrometheusRangeData(param form.PrometheusRequest) (*form.PrometheusResponse, error) {
 	prometheusResponse := s.prometheus.QueryRange(param.Promql, strconv.Itoa(param.Start), strconv.Itoa(param.End), strconv.Itoa(param.Step))
 	return prometheusResponse, nil
 }
 
-//获取区间数的值，为采集到的时间点位设为null
+// 获取区间数的值，为采集到的时间点位设为null
 func valueAxisFillEmptyData(result []*form.PrometheusResult, timeList, labels []string, instanceId string) map[string][]string {
 	resultMap := make(map[string][]string)
 	for _, v := range result {
@@ -172,7 +178,7 @@ func valueAxisFillEmptyData(result []*form.PrometheusResult, timeList, labels []
 	return resultMap
 }
 
-//获取区间数据的时间点位
+// 获取区间数据的时间点位
 func getTimeList(start int, end int, step int, firstTime int) []string {
 	var timeList []string
 	if start > end {
@@ -188,7 +194,7 @@ func getTimeList(start int, end int, step int, firstTime int) []string {
 	return timeList
 }
 
-//数据保留两位小数
+// 数据保留两位小数
 func changeDecimal(value string) string {
 	if strutil.IsBlank(value) {
 		return ""

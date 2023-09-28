@@ -1,12 +1,14 @@
 package web
 
 import (
+	"net/http"
+
+	"code.cestc.cn/ccos-ops/oplog"
+	"github.com/gin-gonic/gin"
+
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/api/actuator"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/api/controller"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/config"
-	"code.cestc.cn/ccos-ops/oplog"
-	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 const pathPrefix = "/api/cmm/"
@@ -73,6 +75,7 @@ func inner() {
 	group := Router.Group(pathPrefix + "inner")
 	{
 		group.GET("/monitorChart/getPrometheusData", monitorChartCtl.GetPrometheusData)
+		group.POST("/monitorChart/postPrometheusData", monitorChartCtl.PostPrometheusData)
 		group.GET("/monitorChart/getPrometheusRangeData", monitorChartCtl.GetPrometheusRangeData)
 		group.POST("/reportForm/getMonitorData", reportFormCtl.GetMonitorData)
 		group.GET("/instance/page", instanceCtl.GetPage)

@@ -1,13 +1,15 @@
 package service
 
 import (
+	"net/url"
+	"strings"
+
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/config"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/form"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/logger"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/util/httputil"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/util/jsonutil"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/util/strutil"
-	"net/url"
 )
 
 type PrometheusService struct {
@@ -28,6 +30,20 @@ func (s *PrometheusService) Query(pql string, time string) *form.PrometheusRespo
 	return sendRequest(requestUrl, pql)
 }
 
+func (s *PrometheusService) PostQuery(pql string, time string) *form.PrometheusResponse {
+	var cfg = config.Cfg.Prometheus
+	query := strings.Split(cfg.Query, "?")
+	requestUrl := cfg.Url + query[0]
+	logger.Logger().Info("requestUrl: " + requestUrl + " pql: " + pql)
+	// pql = url.QueryEscape(pql)
+	queryParam := make(map[string][]string)
+	if strutil.IsNotBlank(time) {
+		queryParam["time"] = []string{time}
+	}
+	queryParam["query"] = []string{pql}
+	return sendPostRequest(requestUrl, queryParam)
+}
+
 func (s *PrometheusService) QueryRange(pql string, start string, end string, step string) *form.PrometheusResponse {
 	var cfg = config.Cfg.Prometheus
 	requestUrl := cfg.Url + cfg.QueryRange
@@ -39,6 +55,17 @@ func (s *PrometheusService) QueryRange(pql string, start string, end string, ste
 func sendRequest(requestUrl string, pql string) *form.PrometheusResponse {
 	prometheusResponse := &form.PrometheusResponse{}
 	response, err := httputil.HttpGet(requestUrl + pql)
+	if err != nil {
+		logger.Logger().Errorf("error:%v\n", err)
+		return prometheusResponse
+	}
+	jsonutil.ToObject(response, &prometheusResponse)
+	return prometheusResponse
+}
+
+func sendPostRequest(requestUrl string, params map[string][]string) *form.PrometheusResponse {
+	prometheusResponse := &form.PrometheusResponse{}
+	response, err := httputil.HttpPostForm(requestUrl, params)
 	if err != nil {
 		logger.Logger().Errorf("error:%v\n", err)
 		return prometheusResponse
