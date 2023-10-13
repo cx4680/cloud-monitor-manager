@@ -67,9 +67,10 @@ type Rocketmq struct {
 }
 
 type Prometheus struct {
-	Url        string `yaml:"url"`
-	Query      string `yaml:"query"`
-	QueryRange string `yaml:"queryRange"`
+	Url                 string `yaml:"url"`
+	Query               string `yaml:"query"`
+	QueryRange          string `yaml:"queryRange"`
+	ThanosQueryFrontend string `yaml:"thanosQueryFrontend"`
 }
 
 type RedisConfig struct {

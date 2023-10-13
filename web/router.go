@@ -78,6 +78,7 @@ func inner() {
 		group.POST("/monitorChart/postPrometheusData", monitorChartCtl.PostPrometheusData)
 		group.GET("/monitorChart/getPrometheusRangeData", monitorChartCtl.GetPrometheusRangeData)
 		group.POST("/reportForm/getMonitorData", reportFormCtl.GetMonitorData)
+		group.POST("/reportForm/getReportFormData", reportFormCtl.GetReportFormData)
 		group.GET("/instance/page", instanceCtl.GetPage)
 	}
 }
