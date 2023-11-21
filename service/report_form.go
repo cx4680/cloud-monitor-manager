@@ -238,7 +238,7 @@ func (s *ReportFormService) GetReportFormData(param form.ReportFormParam) ([]*fo
 	var downSampling = false
 	if int(time.Now().Unix())-param.Start >= 3024000 {
 		downSampling = true
-		if item.Name == "ecs_cpu_base_usage" {
+		if param.Item == "ecs_cpu_base_usage" {
 			item.Expression = ecsCpuBaseUsageDownSampling
 		}
 	}
