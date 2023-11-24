@@ -72,12 +72,12 @@ func sendRequest(requestUrl string, pql string) *form.PrometheusResponse {
 	prometheusResponse := &form.PrometheusResponse{}
 	response, err := httputil.HttpGet(requestUrl + pql)
 	if err != nil {
-		logger.Logger().Errorf("query prometheus error:%v\n", err)
+		logger.Logger().Errorf("query prometheus error:%v, pql: %s, origin response:%s\n", err, pql, response)
 		return prometheusResponse
 	}
 	jsonutil.ToObject(response, &prometheusResponse)
 	if prometheusResponse == nil || prometheusResponse.Data == nil || prometheusResponse.Data.Result == nil || len(prometheusResponse.Data.Result) == 0 {
-		logger.Logger().Infof("query prometheus empty, origin response:%s\n", response)
+		logger.Logger().Infof("query prometheus empty, pql: %s, origin response:%s\n", pql, response)
 	}
 	return prometheusResponse
 }
