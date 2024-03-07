@@ -10,6 +10,7 @@ db:
   max_idle_connes: 10
   max_open_connes: 100
   username: root
+  largeScreenDbDsn: superadmin:b5fd092648@(10.253.60.49:32517)/data_platform?charset=utf8mb4&parseTime=True&loc=Local
 
 logger:
   data_log_prefix: /logs/
@@ -20,6 +21,16 @@ logger:
   compress:
 
 prometheus:
-  url: http://10.253.6.67:32308/api/v1
+  url: http://localhost:60935/api/v1
   query: /query?query=
   queryRange: /query_range?query=
+
+common:
+  regionName: region1
+  rc: http://localhost:56110/rc/resource/page/outer
+  cmdbApi: http://localhost:59642/topo/v3/noauth/find/instassociation/object/device
+  cusInventoryApi: http://localhost:58011/hcmp/res/inventory/new
+  rdbApi: http://localhost:57828/hcmp/rds/manage/resource
+  cmqNodeApi: http://cmq-common.{{.Values.sys.region}}.{{.Values.sys.intranetDomain}}/inner/cmq/v1/node/state
+  cmqInsApi: http://cmq-kafka-product-console.{{.Values.sys.region}}.{{.Values.sys.intranetDomain}}/inner/cmq/v1/kafka/instancenumdata
+
