@@ -1,5 +1,7 @@
 package form
 
+import "time"
+
 type CmdbResponse struct {
 	Result  bool      `json:"result"`
 	Code    int       `json:"code"`
@@ -83,4 +85,93 @@ type CmqCountResponse struct {
 		AllInstanceNum       int64  `json:"allInstanceNum"`
 		ExceptionInstanceNum int64  `json:"exceptionInstanceNum"`
 	} `json:"data"`
+}
+
+type LargeScreenAlertResponse struct {
+	List []*struct {
+		Name                string    `json:"name"`
+		Expr                string    `json:"expr"`
+		Target              string    `json:"target"`
+		Severity            string    `json:"severity"`
+		Type                string    `json:"type"`
+		MonitorType         string    `json:"monitor_type"`
+		Status              string    `json:"status"`
+		Description         string    `json:"description"`
+		StartsAt            time.Time `json:"starts_at"`
+		Start               int       `json:"start"`
+		AlertId             string    `json:"alert_id"`
+		Ip                  string    `json:"ip"`
+		AlertAttr           string    `json:"alert_attr"`
+		InstId              string    `json:"inst_id"`
+		OperationType       string    `json:"operation_type"`
+		ResponsiblePerson   string    `json:"responsible_person"`
+		ResponsiblePersonId string    `json:"responsible_person_id"`
+	} `json:"list"`
+	P1 int `json:"p1"`
+	P2 int `json:"p2"`
+	P3 int `json:"p3"`
+	P4 int `json:"p4"`
+}
+
+type CocClusterDeployment struct {
+	List []*CocCluster `json:"list"`
+}
+
+type CocClusterStatefulSet struct {
+	List []*CocCluster `json:"list"`
+}
+
+type CocCluster struct {
+	Name          string            `json:"name"`
+	Namespace     string            `json:"namespace"`
+	InstanceTotal int32             `json:"instance_total"`
+	InstanceReady int32             `json:"instance_ready"`
+	Containers    []string          `json:"containers"`
+	Images        []string          `json:"images"`
+	Labels        map[string]string `json:"labels"`
+	CreateTime    time.Time         `json:"create_time"`
+}
+
+type CocClusterPod struct {
+	Data *Pod `json:"data"`
+}
+
+type Pod struct {
+	Name   string `json:"name"`
+	Time   string `json:"time"`
+	Status string `json:"status"`
+}
+
+type DiskResponse struct {
+	Data *struct {
+		TotalCount int `json:"total_count"`
+		Stats      []*struct {
+			DiskId     string `json:"disk_id"`
+			NodeName   string `json:"node_name"`
+			NodeIp     string `json:"node_ip"`
+			DiskStatus string `json:"disk_status"`
+			FaultTime  string `json:"fault_time"`
+		} `json:"stats"`
+	} `json:"data"`
+}
+
+type EbsResponse struct {
+	Data *struct {
+		TotalCount int `json:"total_count"`
+		PoolStatus []*struct {
+			Name              string  `json:"name"`
+			TotalCapacity     float64 `json:"totalCapacity"`
+			UsedCapacity      float64 `json:"usedCapacity"`
+			AvailableCapacity float64 `json:"availableCapacity"`
+			LicenseLeftTime   string  `json:"license_left_day"`
+		} `json:"pool_status"`
+	} `json:"data"`
+}
+
+type LargeScreenResourceOverview struct {
+	Ecs struct{} `json:"ecs"`
+	Eip struct{} `json:"eip"`
+	Rdb struct{} `json:"rdb"`
+	Slb struct{} `json:"slb"`
+	Nat struct{} `json:"nat"`
 }

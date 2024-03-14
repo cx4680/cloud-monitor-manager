@@ -33,4 +33,7 @@ common:
   rdbApi: http://localhost:57828/hcmp/rds/manage/resource
   cmqNodeApi: http://cmq-common.{{.Values.sys.region}}.{{.Values.sys.intranetDomain}}/inner/cmq/v1/node/state
   cmqInsApi: http://cmq-kafka-product-console.{{.Values.sys.region}}.{{.Values.sys.intranetDomain}}/inner/cmq/v1/kafka/instancenumdata
+  largeScreenAlertApi: http://localhost:56385/api/alert/ywLargeScreen/alerts
+  cocClusterBigScreenApi: http://localhost:51156/api/ccm/bigscreen
+  ebsApi: http://localhost:52057/compute/ebs/ops/v1/volumes
 

@@ -20,17 +20,20 @@ type AppConfig struct {
 }
 
 type CommonConfig struct {
-	Env             string `yaml:"env"`
-	EnvType         string `yaml:"envType"`
-	Nk              string `yaml:"nk"`
-	RegionName      string `yaml:"regionName"`
-	Rc              string `yaml:"rc"`
-	AsyncExportApi  string `yaml:"asyncExportApi"`
-	CmdbApi         string `yaml:"cmdbApi"`
-	CusInventoryApi string `yaml:"cusInventoryApi"`
-	RdbApi          string `yaml:"rdbApi"`
-	CmqNodeApi      string `yaml:"cmqNodeApi"`
-	CmqInsApi       string `yaml:"cmqInsApi"`
+	Env                    string `yaml:"env"`
+	EnvType                string `yaml:"envType"`
+	Nk                     string `yaml:"nk"`
+	RegionName             string `yaml:"regionName"`
+	Rc                     string `yaml:"rc"`
+	AsyncExportApi         string `yaml:"asyncExportApi"`
+	CmdbApi                string `yaml:"cmdbApi"`
+	CusInventoryApi        string `yaml:"cusInventoryApi"`
+	RdbApi                 string `yaml:"rdbApi"`
+	CmqNodeApi             string `yaml:"cmqNodeApi"`
+	CmqInsApi              string `yaml:"cmqInsApi"`
+	LargeScreenAlertApi    string `yaml:"largeScreenAlertApi"`
+	CocClusterBigScreenApi string `yaml:"cocClusterBigScreenApi"`
+	EbsApi                 string `yaml:"ebsApi"`
 }
 
 type Serve struct {
@@ -41,14 +44,13 @@ type Serve struct {
 }
 
 type DB struct {
-	Dialect          string        `yaml:"dialect"`
-	Username         string        `yaml:"username"`
-	Password         string        `yaml:"password"`
-	Url              string        `yaml:"url"`
-	MaxIdleConnes    int           `yaml:"max_idle_connes"`
-	MaxOpenConnes    int           `yaml:"max_open_connes"`
-	MaxLifeTime      time.Duration `yaml:"time.Hour"`
-	LargeScreenDbDsn string        `yaml:"largeScreenDbDsn"`
+	Dialect       string        `yaml:"dialect"`
+	Username      string        `yaml:"username"`
+	Password      string        `yaml:"password"`
+	Url           string        `yaml:"url"`
+	MaxIdleConnes int           `yaml:"max_idle_connes"`
+	MaxOpenConnes int           `yaml:"max_open_connes"`
+	MaxLifeTime   time.Duration `yaml:"time.Hour"`
 }
 
 type LogConfig struct {

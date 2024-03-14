@@ -48,6 +48,7 @@ func loadRouters() {
 	monitorChart()
 	reportForm()
 	configItemRouters()
+	LargeScreenRouters()
 }
 
 func actuatorMapping() {
@@ -134,5 +135,19 @@ func configItemRouters() {
 	group := Router.Group(pathPrefix + "configItem/")
 	{
 		group.GET("/getMonitorRange", oplog.GinTrail(NewV1OperatorInfo("GetMonitorRangeList", "获取监控查询步长", RequestTypeRead, oplog.INFO)), ctl.GetMonitorRange)
+	}
+}
+
+func LargeScreenRouters() {
+	ctl := controller.NewLargeScreenCtl()
+	group := Router.Group(pathPrefix + "largeScreen/")
+	{
+		group.GET("/tags", oplog.GinTrail(NewV1OperatorInfo("GetResourceOverview", "查询大屏资源概览", RequestTypeRead, oplog.INFO)), ctl.Tags)
+		group.GET("/resource/overview", oplog.GinTrail(NewV1OperatorInfo("GetResourceOverview", "查询大屏资源概览", RequestTypeRead, oplog.INFO)), ctl.ResourceOverview)
+		group.GET("/resource/alert", oplog.GinTrail(NewV1OperatorInfo("GetResourceAlert", "查询大屏资源告警", RequestTypeRead, oplog.INFO)), ctl.ResourceOverview)
+		group.GET("/ecs", oplog.GinTrail(NewV1OperatorInfo("GetResourceEcs", "查询大屏ecs", RequestTypeRead, oplog.INFO)), ctl.ResourceEcs)
+		group.GET("/eip", oplog.GinTrail(NewV1OperatorInfo("GetResourceEip", "查询大屏eip", RequestTypeRead, oplog.INFO)), ctl.ResourceEip)
+		group.GET("/rdb", oplog.GinTrail(NewV1OperatorInfo("GetResourceRdb", "查询大屏rdb", RequestTypeRead, oplog.INFO)), ctl.ResourceEcs)
+		group.GET("/storage", oplog.GinTrail(NewV1OperatorInfo("GetResourceStorage", "查询大屏storage", RequestTypeRead, oplog.INFO)), ctl.ResourceStorage)
 	}
 }

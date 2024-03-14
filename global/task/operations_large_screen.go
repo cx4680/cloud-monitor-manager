@@ -30,98 +30,26 @@ func OperationsLargeScreen() BusinessTaskDTO {
 			logger.Logger().Error(err)
 			return
 		}
-		var newResourceRunningStatusList []*model.OperationsLargeScreenResourceRunningStatus
-		var deleteResourceRunningStatusIdList []string
-		var newResourceUsageTopList []*model.OperationsLargeScreenResourceUsageTop
-		var deleteResourceUsageTopIdList []string
-
-		//查询物理服务器
-		newPhysicalServerList, deletePhysicalServerIdList, err := getPhysicalServerData(db, region)
-		if err != nil {
-			logger.Logger().Errorf("getPhysicalServerData error: %v", err)
-		}
-		newResourceRunningStatusList = append(newResourceRunningStatusList, newPhysicalServerList...)
-		deleteResourceRunningStatusIdList = append(deleteResourceRunningStatusIdList, deletePhysicalServerIdList...)
-
-		//查询网络设备
-		newNetworkDeviceList, deleteNetworkDeviceIdList, err := getNetworkDeviceData(db, region)
-		if err != nil {
-			logger.Logger().Errorf("getNetworkDeviceData error: %v", err)
-		}
-		newResourceRunningStatusList = append(newResourceRunningStatusList, newNetworkDeviceList...)
-		deleteResourceRunningStatusIdList = append(deleteResourceRunningStatusIdList, deleteNetworkDeviceIdList...)
-
-		//查询ECS
-		newEcsList, deleteEcsIdList, err := getEcsData(db, region)
-		if err != nil {
-			logger.Logger().Errorf("getEcsData error: %v", err)
-		}
-		newResourceRunningStatusList = append(newResourceRunningStatusList, newEcsList...)
-		deleteResourceRunningStatusIdList = append(deleteResourceRunningStatusIdList, deleteEcsIdList...)
-
-		//查询数据库
-		newRdbList, deleteRdbIdList, err := getRdbData(db, region)
-		if err != nil {
-			logger.Logger().Errorf("getDbData error: %v", err)
-		}
-		newResourceRunningStatusList = append(newResourceRunningStatusList, newRdbList...)
-		deleteResourceRunningStatusIdList = append(deleteResourceRunningStatusIdList, deleteRdbIdList...)
-
-		//裸金属
-		newBmsList, deleteBmsIdList, err := getBmsData(db, region)
-		if err != nil {
-			logger.Logger().Errorf("getBmsData error: %v", err)
-		}
-		newResourceRunningStatusList = append(newResourceRunningStatusList, newBmsList...)
-		deleteResourceRunningStatusIdList = append(deleteResourceRunningStatusIdList, deleteBmsIdList...)
+		//查询分配量和总量数据
+		go getResourceAllocationTotalDate(db, region)
 
 		//查询top数据
-		newResourceUsageTopList, deleteResourceUsageTopIdList, err = getUsageData(db, region)
-		if err != nil {
-			logger.Logger().Errorf("getUsageData error: %v", err)
-		}
+		go getUsageData(db, region, OperationsCodeList)
 
-		//查询分配量和总量数据
-		resourceAllocationTotalList, err := getResourceAllocationTotalDate(db, region)
-		if err != nil {
-			logger.Logger().Errorf("getResourceAllocationTotalDate error: %v", err)
-		}
+		//查询物理服务器
+		go getPhysicalServerData(db, region)
 
-		//推送远程数据库
-		if err = pushRemoteDb.Transaction(func(tx *gorm.DB) error {
-			//operations_large_screen_resource_running_status
-			if len(deleteResourceRunningStatusIdList) > 0 {
-				if err = tx.Delete(&model.OperationsLargeScreenResourceRunningStatus{}, "resource_id IN ?", deleteResourceRunningStatusIdList).Error; err != nil {
-					return err
-				}
-			}
-			if len(newResourceRunningStatusList) > 0 {
-				if err = tx.Save(newResourceRunningStatusList).Error; err != nil {
-					return err
-				}
-			}
-			//operations_large_screen_resource_usage_top
-			if len(deleteResourceUsageTopIdList) > 0 {
-				if err = tx.Delete(&model.OperationsLargeScreenResourceUsageTop{}, "resource_id IN (?)", deleteResourceUsageTopIdList).Error; err != nil {
-					return err
-				}
-			}
-			if len(newResourceUsageTopList) > 0 {
-				if err = tx.Save(newResourceUsageTopList).Error; err != nil {
-					return err
-				}
-			}
-			//operations_large_screen_resource_allocation_total
-			if len(resourceAllocationTotalList) > 0 {
-				if err = tx.Save(resourceAllocationTotalList).Error; err != nil {
-					return err
-				}
-			}
-			return nil
-		}); err != nil {
-			logger.Logger().Error(err)
-			return
-		}
+		//查询网络设备
+		go getNetworkDeviceData(db, region)
+
+		//查询ECS
+		go getEcsData(db, region)
+
+		//查询数据库
+		go getRdbData(db, region)
+
+		//裸金属
+		go getBmsData(db, region)
 	}
 	return BusinessTaskDTO{
 		Cron: "0 */5 * * * ?",
@@ -130,27 +58,90 @@ func OperationsLargeScreen() BusinessTaskDTO {
 	}
 }
 
-func getPhysicalServerData(db *gorm.DB, region string) ([]*model.OperationsLargeScreenResourceRunningStatus, []string, error) {
+// 运营大屏资源状态表 operations_large_screen_resource_running_status
+func saveTableOperationsLargeScreenResourceRunningStatus(db *gorm.DB, newList []*model.OperationsLargeScreenResourceRunningStatus, deleteIdList []int64) {
+	if err := db.Transaction(func(tx *gorm.DB) error {
+		if len(deleteIdList) > 0 {
+			if err := tx.Delete(&model.OperationsLargeScreenResourceRunningStatus{}, deleteIdList).Error; err != nil {
+				return err
+			}
+		}
+		if len(newList) > 0 {
+			if err := tx.Save(newList).Error; err != nil {
+				return err
+			}
+		}
+		return nil
+	}); err != nil {
+		logger.Logger().Error("saveTableOperationsLargeScreenResourceRunningStatus error: ", err)
+		return
+	}
+}
+
+// 运营大屏资源top表 operations_large_screen_resource_usage_top
+func saveTableOperationsLargeScreenResourceUsageTop(db *gorm.DB, newList []*model.OperationsLargeScreenResourceUsageTop, deleteIdList []int64) {
+	if err := db.Transaction(func(tx *gorm.DB) error {
+		if len(deleteIdList) > 0 {
+			if err := tx.Delete(&model.OperationsLargeScreenResourceUsageTop{}, deleteIdList).Error; err != nil {
+				return err
+			}
+		}
+		if len(newList) > 0 {
+			if err := tx.Save(newList).Error; err != nil {
+				return err
+			}
+		}
+		return nil
+	}); err != nil {
+		logger.Logger().Error("saveTableOperationsLargeScreenResourceUsageTop error: ", err)
+		return
+	}
+}
+
+// 运营大屏资源分配表 operations_large_screen_resource_allocation_total
+func saveTableOperationsLargeScreenResourceAllocationTotal(db *gorm.DB, newList []*model.OperationsLargeScreenResourceAllocationTotal, deleteIdList []int64) {
+	if err := db.Transaction(func(tx *gorm.DB) error {
+		if len(deleteIdList) > 0 {
+			if err := tx.Delete(&model.OperationsLargeScreenResourceAllocationTotal{}, deleteIdList).Error; err != nil {
+				return err
+			}
+		}
+		if len(newList) > 0 {
+			if err := tx.Save(newList).Error; err != nil {
+				return err
+			}
+		}
+		return nil
+	}); err != nil {
+		logger.Logger().Error("saveTableOperationsLargeScreenResourceAllocationTotal error: ", err)
+		return
+	}
+}
+
+func getPhysicalServerData(db *gorm.DB, region string) {
 	param := "{\"condition\":{\"device\":[{\"field\":\"category_name\",\"operator\":\"$regex\",\"value\":\"服务器\"}]},\"fields\":{},\"page\":{\"start\":0,\"limit\":5000,\"sort\":\"\"}}"
 	var response *form.CmdbResponse
 	_, err := httputil.GetHttpClient().R().SetResult(&response).SetBody(param).Post(config.Cfg.Common.CmdbApi)
 	if err != nil {
-		return nil, nil, err
+		logger.Logger().Error("getPhysicalServerData error: ", err)
+		return
 	}
 	//查询数据库的旧数据
 	var oldList []*model.OperationsLargeScreenResourceRunningStatus
 	if err = db.Where("region = ? AND type = ?", region, "PhysicalServer").Find(&oldList).Error; err != nil {
-		return nil, nil, err
+		logger.Logger().Error("getPhysicalServerData error: ", err)
+		return
 	}
-	var oldMap = make(map[string]*model.OperationsLargeScreenResourceRunningStatus)
-	for _, old := range oldList {
-		oldMap[old.ResourceId] = old
+	var oldMap = make(map[string]int64)
+	for _, v := range oldList {
+		oldMap[v.ResourceId] = v.Id
 	}
 	var newList []*model.OperationsLargeScreenResourceRunningStatus
 	var newMap = make(map[string]interface{})
 	for _, v := range response.Data.Info {
 		newMap[v.Ip] = nil
 		var newModel = &model.OperationsLargeScreenResourceRunningStatus{
+			Id:          oldMap[v.Ip],
 			ResourceId:  v.Ip,
 			Status:      v.RunStatus,
 			Type:        "PhysicalServer",
@@ -158,9 +149,6 @@ func getPhysicalServerData(db *gorm.DB, region string) ([]*model.OperationsLarge
 			FailureTime: util.TimeToStr(util.StrToTime(util.FullTimeFmt, v.CpuUpdateTime), util.MonthDayTimeFmt),
 			CreateTime:  v.CreateTime,
 		}
-		if _, ok := oldMap[v.Ip]; ok {
-			newModel.Id = oldMap[v.Ip].Id
-		}
 		if v.RunStatus != 1 && v.RunStatus != 0 {
 			newModel.Status = 2
 		}
@@ -169,36 +157,39 @@ func getPhysicalServerData(db *gorm.DB, region string) ([]*model.OperationsLarge
 		}
 		newList = append(newList, newModel)
 	}
-	var deleteIdList []string
+	var deleteIdList []int64
 	for _, old := range oldList {
 		if _, ok := newMap[old.ResourceId]; !ok {
-			deleteIdList = append(deleteIdList, old.ResourceId)
+			deleteIdList = append(deleteIdList, old.Id)
 		}
 	}
-	return newList, deleteIdList, nil
+	saveTableOperationsLargeScreenResourceRunningStatus(db, newList, deleteIdList)
 }
 
-func getNetworkDeviceData(db *gorm.DB, region string) ([]*model.OperationsLargeScreenResourceRunningStatus, []string, error) {
+func getNetworkDeviceData(db *gorm.DB, region string) {
 	param := "{\"condition\":{\"device\":[{\"field\":\"business_type\",\"operator\":\"$regex\",\"value\":\"XGW\"},{\"field\":\"category_name\",\"operator\":\"$regex\",\"value\":\"服务器\"}]},\"fields\":{},\"page\":{\"start\":0,\"limit\":5000,\"sort\":\"\"}}"
 	var response *form.CmdbResponse
 	_, err := httputil.GetHttpClient().R().SetResult(&response).SetBody(param).Post(config.Cfg.Common.CmdbApi)
 	if err != nil {
-		return nil, nil, err
+		logger.Logger().Error("getNetworkDeviceData error: ", err)
+		return
 	}
 	//查询数据库的旧数据
 	var oldList []*model.OperationsLargeScreenResourceRunningStatus
 	if err = db.Where("region = ? AND type = ?", region, "NetworkDevice").Find(&oldList).Error; err != nil {
-		return nil, nil, err
+		logger.Logger().Error("getNetworkDeviceData error: ", err)
+		return
 	}
-	var oldMap = make(map[string]*model.OperationsLargeScreenResourceRunningStatus)
-	for _, old := range oldList {
-		oldMap[old.ResourceId] = old
+	var oldMap = make(map[string]int64)
+	for _, v := range oldList {
+		oldMap[v.ResourceId] = v.Id
 	}
 	var newList []*model.OperationsLargeScreenResourceRunningStatus
 	var newMap = make(map[string]interface{})
 	for _, v := range response.Data.Info {
 		newMap[v.Ip] = nil
 		var newModel = &model.OperationsLargeScreenResourceRunningStatus{
+			Id:          oldMap[v.Ip],
 			ResourceId:  v.Ip,
 			Status:      v.RunStatus,
 			Type:        "NetworkDevice",
@@ -206,9 +197,6 @@ func getNetworkDeviceData(db *gorm.DB, region string) ([]*model.OperationsLargeS
 			FailureTime: util.TimeToStr(util.StrToTime(util.FullTimeFmt, v.CpuUpdateTime), util.MonthDayTimeFmt),
 			CreateTime:  v.CreateTime,
 		}
-		if _, ok := oldMap[v.Ip]; ok {
-			newModel.Id = oldMap[v.Ip].Id
-		}
 		if v.RunStatus != 1 && v.RunStatus != 0 {
 			newModel.Status = 2
 		}
@@ -217,88 +205,92 @@ func getNetworkDeviceData(db *gorm.DB, region string) ([]*model.OperationsLargeS
 		}
 		newList = append(newList, newModel)
 	}
-	var deleteIdList []string
+	var deleteIdList []int64
 	for _, old := range oldList {
 		if _, ok := newMap[old.ResourceId]; !ok {
-			deleteIdList = append(deleteIdList, old.ResourceId)
+			deleteIdList = append(deleteIdList, old.Id)
 		}
 	}
-	return newList, deleteIdList, nil
+	saveTableOperationsLargeScreenResourceRunningStatus(db, newList, deleteIdList)
 }
 
-func getEcsData(db *gorm.DB, region string) ([]*model.OperationsLargeScreenResourceRunningStatus, []string, error) {
+func getEcsData(db *gorm.DB, region string) {
 	param := external.InstanceRequest{
 		CloudProductCode: "ECS",
 		ResourceTypeCode: "instance",
 		CurrPage:         "1",
 		PageSize:         "9999",
+		RegionCode:       region,
 	}
 	var response *external.InstanceResponse
 	_, err := httputil.GetHttpClient().R().SetResult(&response).SetBody(param).Post(config.Cfg.Common.Rc)
 	if err != nil {
-		return nil, nil, err
+		logger.Logger().Error("getEcsData error: ", err)
+		return
 	}
 	if response == nil || response.Msg != "success" {
-		return nil, nil, nil
+		return
 	}
 	//查询数据库的旧数据
 	var oldList []*model.OperationsLargeScreenResourceRunningStatus
 	if err = db.Where("region = ? AND type = ?", region, "ECS").Find(&oldList).Error; err != nil {
-		return nil, nil, err
+		logger.Logger().Error("getEcsData error: ", err)
+		return
 	}
-	var oldMap = make(map[string]*model.OperationsLargeScreenResourceRunningStatus)
-	for _, old := range oldList {
-		oldMap[old.ResourceId] = old
+	var oldMap = make(map[string]int64)
+	for _, v := range oldList {
+		oldMap[v.ResourceId] = v.Id
 	}
 	var newList []*model.OperationsLargeScreenResourceRunningStatus
 	var newMap = make(map[string]interface{})
 	for _, v := range response.Data.List {
 		newMap[v.ResourceId] = nil
 		var newModel = &model.OperationsLargeScreenResourceRunningStatus{
+			Id:          oldMap[v.ResourceId],
 			ResourceId:  v.ResourceId,
 			Type:        "ECS",
-			Region:      config.Cfg.Common.RegionName,
+			Region:      v.RegionCode,
 			FailureTime: util.TimestampToFmtStr(int64(v.UpdateTime)/1000, "01-02 15:04:05"),
 			CreateTime:  util.TimestampToFullTimeFmtStr(int64(v.CreateTime) / 1000),
-		}
-		if _, ok := oldMap[v.ResourceId]; ok {
-			newModel.Id = oldMap[v.ResourceId].Id
 		}
 		if v.StatusDesc == "active" {
 			newModel.Status = 1
 		} else {
-			newModel.Status = 0
+			newModel.Status = 2
 		}
 		newList = append(newList, newModel)
 	}
-	var deleteIdList []string
+	var deleteIdList []int64
 	for _, old := range oldList {
 		if _, ok := newMap[old.ResourceId]; !ok {
-			deleteIdList = append(deleteIdList, old.ResourceId)
+			deleteIdList = append(deleteIdList, old.Id)
 		}
 	}
-	return newList, deleteIdList, nil
+	saveTableOperationsLargeScreenResourceRunningStatus(db, newList, deleteIdList)
 }
 
-func getRdbData(db *gorm.DB, region string) ([]*model.OperationsLargeScreenResourceRunningStatus, []string, error) {
+func getRdbData(db *gorm.DB, region string) {
 	var paramList = []*external.InstanceRequest{
 		{
 			CloudProductCode: "RDB",
 			ResourceTypeCode: "mysql",
 			CurrPage:         "1",
 			PageSize:         "9999",
+			RegionCode:       region,
 		},
 		{
 			CloudProductCode: "RDB",
 			ResourceTypeCode: "dm",
 			CurrPage:         "1",
 			PageSize:         "9999",
+			RegionCode:       region,
 		},
 		{
 			CloudProductCode: "RDB",
 			ResourceTypeCode: "pg",
 			CurrPage:         "1",
 			PageSize:         "9999",
+			RegionCode:       region,
 		},
 	}
 	var responseDataList []*external.InstanceList
@@ -306,7 +298,8 @@ func getRdbData(db *gorm.DB, region string) ([]*model.OperationsLargeScreenResou
 		var response *external.InstanceResponse
 		_, err := httputil.GetHttpClient().R().SetResult(&response).SetBody(param).Post(config.Cfg.Common.Rc)
 		if err != nil {
-			return nil, nil, err
+			logger.Logger().Error("getRdbData error: ", err)
+			continue
 		}
 		if response == nil || response.Msg != "success" {
 			continue
@@ -315,56 +308,60 @@ func getRdbData(db *gorm.DB, region string) ([]*model.OperationsLargeScreenResou
 	}
 	//查询数据库的旧数据
 	var oldList []*model.OperationsLargeScreenResourceRunningStatus
-	if err := db.Where("region = ? AND type = ?", region, "RDB").Find(&oldList).Error; err != nil {
-		return nil, nil, err
+	if err := db.Where("region = ? AND type = ?", region, "数据库").Find(&oldList).Error; err != nil {
+		logger.Logger().Error("getRdbData error: ", err)
+		return
 	}
-	var oldMap = make(map[string]*model.OperationsLargeScreenResourceRunningStatus)
-	for _, old := range oldList {
-		oldMap[old.ResourceId] = old
+	var oldMap = make(map[string]int64)
+	for _, v := range oldList {
+		oldMap[v.ResourceId] = v.Id
 	}
 	var newList []*model.OperationsLargeScreenResourceRunningStatus
-	var deleteIdList []string
 	var newMap = make(map[string]interface{})
 	for _, v := range responseDataList {
 		newMap[v.ResourceId] = nil
 		var newModel = &model.OperationsLargeScreenResourceRunningStatus{
+			Id:          oldMap[v.ResourceId],
 			ResourceId:  v.ResourceId,
 			Type:        "数据库",
-			Region:      config.Cfg.Common.RegionName,
+			Region:      v.RegionCode,
 			FailureTime: util.TimestampToFmtStr(int64(v.UpdateTime)/1000, "01-02 15:04:05"),
 			CreateTime:  util.TimestampToFullTimeFmtStr(int64(v.CreateTime) / 1000),
 		}
-		if _, ok := oldMap[v.ResourceId]; ok {
-			newModel.Id = oldMap[v.ResourceId].Id
-		}
-		if v.StatusDesc == "运行中" {
+		if v.StatusDesc == "运行中" || v.StatusDesc == "创建中" || v.StatusDesc == "扩缩容中" || v.StatusDesc == "主库运行中" ||
+			v.StatusDesc == "停止" || v.StatusDesc == "维护中" || v.StatusDesc == "重启中" || v.StatusDesc == "删除中" ||
+			v.StatusDesc == "备份中" || v.StatusDesc == "备份恢复中" || v.StatusDesc == "实例被冻结" || v.StatusDesc == "从库重建中" ||
+			v.StatusDesc == "初始化中" || v.StatusDesc == "启动中" || v.StatusDesc == "停止中" || v.StatusDesc == "正在删除状态" {
 			newModel.Status = 1
 		} else {
-			newModel.Status = 0
+			newModel.Status = 2
 		}
 		newList = append(newList, newModel)
 	}
+	var deleteIdList []int64
 	for _, old := range oldList {
 		if _, ok := newMap[old.ResourceId]; !ok {
-			deleteIdList = append(deleteIdList, old.ResourceId)
+			deleteIdList = append(deleteIdList, old.Id)
 		}
 	}
-	return newList, deleteIdList, nil
+	saveTableOperationsLargeScreenResourceRunningStatus(db, newList, deleteIdList)
 }
 
-func getBmsData(db *gorm.DB, region string) ([]*model.OperationsLargeScreenResourceRunningStatus, []string, error) {
+func getBmsData(db *gorm.DB, region string) {
 	var paramList = []*external.InstanceRequest{
 		{
 			CloudProductCode: "BMS",
 			ResourceTypeCode: "TBMS",
 			CurrPage:         "1",
 			PageSize:         "9999",
+			RegionCode:       region,
 		},
 		{
 			CloudProductCode: "BMS",
 			ResourceTypeCode: "EBMS",
 			CurrPage:         "1",
 			PageSize:         "9999",
+			RegionCode:       region,
 		},
 	}
 	var responseDataList []*external.InstanceList
@@ -372,7 +369,8 @@ func getBmsData(db *gorm.DB, region string) ([]*model.OperationsLargeScreenResou
 		var response *external.InstanceResponse
 		_, err := httputil.GetHttpClient().R().SetResult(&response).SetBody(param).Post(config.Cfg.Common.Rc)
 		if err != nil {
-			return nil, nil, err
+			logger.Logger().Error("getBmsData error: ", err)
+			continue
 		}
 		if response == nil || response.Msg != "success" {
 			continue
@@ -381,44 +379,43 @@ func getBmsData(db *gorm.DB, region string) ([]*model.OperationsLargeScreenResou
 	}
 	//查询数据库的旧数据
 	var oldList []*model.OperationsLargeScreenResourceRunningStatus
-	if err := db.Where("region = ? AND type = ?", region, "BMS").Find(&oldList).Error; err != nil {
-		return nil, nil, err
+	if err := db.Where("region = ? AND type = ?", region, "裸金属").Find(&oldList).Error; err != nil {
+		logger.Logger().Error("getBmsData error: ", err)
+		return
 	}
-	var oldMap = make(map[string]*model.OperationsLargeScreenResourceRunningStatus)
-	for _, old := range oldList {
-		oldMap[old.ResourceId] = old
+	var oldMap = make(map[string]int64)
+	for _, v := range oldList {
+		oldMap[v.ResourceId] = v.Id
 	}
 	var newList []*model.OperationsLargeScreenResourceRunningStatus
 	var newMap = make(map[string]interface{})
 	for _, v := range responseDataList {
 		newMap[v.ResourceId] = nil
 		var newModel = &model.OperationsLargeScreenResourceRunningStatus{
+			Id:          oldMap[v.ResourceId],
 			ResourceId:  v.ResourceId,
 			Type:        "裸金属",
-			Region:      config.Cfg.Common.RegionName,
+			Region:      v.RegionCode,
 			FailureTime: util.TimestampToFmtStr(int64(v.UpdateTime)/1000, "01-02 15:04:05"),
 			CreateTime:  util.TimestampToFullTimeFmtStr(int64(v.CreateTime) / 1000),
-		}
-		if _, ok := oldMap[v.ResourceId]; ok {
-			newModel.Id = oldMap[v.ResourceId].Id
 		}
 		if v.StatusDesc == "running" {
 			newModel.Status = 1
 		} else {
-			newModel.Status = 0
+			newModel.Status = 2
 		}
 		newList = append(newList, newModel)
 	}
-	var deleteIdList []string
+	var deleteIdList []int64
 	for _, old := range oldList {
 		if _, ok := newMap[old.ResourceId]; !ok {
-			deleteIdList = append(deleteIdList, old.ResourceId)
+			deleteIdList = append(deleteIdList, old.Id)
 		}
 	}
-	return newList, deleteIdList, nil
+	saveTableOperationsLargeScreenResourceRunningStatus(db, newList, deleteIdList)
 }
 
-var codeList = []string{
+var OperationsCodeList = []string{
 	"ecs_cpu_base_usage",            //ECS cpu使用率
 	"ecs_memory_base_usage",         //ECS 内存使用率
 	"mysql_cpu_usage",               //RDB mysql cpu使用率
@@ -433,11 +430,11 @@ var codeList = []string{
 	"eip_upstream_bandwidth_usage",  //EIP 出网带宽使用率
 }
 
-func getUsageData(db *gorm.DB, region string) ([]*model.OperationsLargeScreenResourceUsageTop, []string, error) {
+func getUsageData(db *gorm.DB, region string, codeList []string) {
 	var newList []*model.OperationsLargeScreenResourceUsageTop
-	var deleteIdList []string
+	var deleteIdList []int64
 	for _, code := range codeList {
-		var resourceType, attribute string
+		var resourceType, attribute, unit string
 		switch code {
 		case "ecs_cpu_base_usage":
 			resourceType = "ECS"
@@ -454,6 +451,7 @@ func getUsageData(db *gorm.DB, region string) ([]*model.OperationsLargeScreenRes
 		case "mysql_current_cons_num", "dm_global_status_sessions", "pg_open_ct_num":
 			resourceType = "RDB"
 			attribute = "连接数"
+			unit = "个"
 		case "eip_upstream_bandwidth_usage":
 			resourceType = "EIP"
 			attribute = "带宽"
@@ -461,14 +459,15 @@ func getUsageData(db *gorm.DB, region string) ([]*model.OperationsLargeScreenRes
 		//查询指标
 		var monitorItem *model.MonitorItem
 		if err := global.DB.Where("metric_name = ?", code).Find(&monitorItem).Error; err != nil {
-			return nil, nil, err
+			logger.Logger().Error("getUsageData error: ", err)
+			continue
 		}
 		pql := fmt.Sprintf(constant.TopExpr, "10", strings.ReplaceAll(monitorItem.MetricsLinux, constant.MetricLabel, ""))
 		prometheusUrl := config.Cfg.Prometheus.Url + config.Cfg.Prometheus.Query + url.QueryEscape(pql)
 		response := &form.PrometheusResponse{}
 		_, err := httputil.GetHttpClient().R().SetResult(&response).Get(prometheusUrl)
 		if err != nil {
-			logger.Logger().Error(err)
+			logger.Logger().Error("getUsageData error: ", err)
 			continue
 		}
 		if response == nil || response.Data == nil || response.Data.Result == nil || len(response.Data.Result) == 0 {
@@ -478,11 +477,15 @@ func getUsageData(db *gorm.DB, region string) ([]*model.OperationsLargeScreenRes
 		//查询数据库的旧数据
 		var oldList []*model.OperationsLargeScreenResourceUsageTop
 		if err = db.Where("region = ? AND type = ? AND attribute = ?", region, resourceType, attribute).Find(&oldList).Error; err != nil {
-			return nil, nil, err
+			logger.Logger().Error("getUsageData error: ", err)
+			continue
 		}
-		var oldMap = make(map[string]*model.OperationsLargeScreenResourceUsageTop)
-		for _, old := range oldList {
-			oldMap[old.ResourceId] = old
+		var oldMap = make(map[string]int64)
+		for _, v := range oldList {
+			oldMap[v.ResourceId] = v.Id
+		}
+		if strutil.IsBlank(unit) {
+			unit = monitorItem.Unit
 		}
 		var newMap = make(map[string]interface{})
 		for _, v := range response.Data.Result {
@@ -490,25 +493,23 @@ func getUsageData(db *gorm.DB, region string) ([]*model.OperationsLargeScreenRes
 			number := changeDecimal(v.Value[1].(string))
 			newMap[resourceId] = nil
 			newModel := &model.OperationsLargeScreenResourceUsageTop{
+				Id:         oldMap[resourceId],
 				ResourceId: resourceId,
 				Type:       resourceType,
 				Attribute:  attribute,
 				Number:     number,
-				Unit:       monitorItem.Unit,
+				Unit:       unit,
 				Region:     config.Cfg.Common.RegionName,
-			}
-			if _, ok := oldMap[resourceId]; ok {
-				newModel.Id = oldMap[resourceId].Id
 			}
 			newList = append(newList, newModel)
 		}
 		for _, old := range oldList {
 			if _, ok := newMap[old.ResourceId]; !ok {
-				deleteIdList = append(deleteIdList, old.ResourceId)
+				deleteIdList = append(deleteIdList, old.Id)
 			}
 		}
 	}
-	return newList, deleteIdList, nil
+	saveTableOperationsLargeScreenResourceUsageTop(db, newList, deleteIdList)
 }
 
 // 数据保留两位小数
@@ -517,7 +518,7 @@ func changeDecimal(value string) float64 {
 	return math.Trunc(v*1e2+0.5) * 1e-2
 }
 
-func getResourceAllocationTotalDate(db *gorm.DB, region string) ([]*model.OperationsLargeScreenResourceAllocationTotal, error) {
+func getResourceAllocationTotalDate(db *gorm.DB, region string) {
 	var newList []*model.OperationsLargeScreenResourceAllocationTotal
 	//ECS
 	ecsResourceAllocationTotalDate, err := getEcsResourceAllocationTotalDate(region)
@@ -564,19 +565,25 @@ func getResourceAllocationTotalDate(db *gorm.DB, region string) ([]*model.Operat
 	//查询数据库的旧数据
 	var oldList []*model.OperationsLargeScreenResourceAllocationTotal
 	if err = db.Where("region = ?", region).Find(&oldList).Error; err != nil {
-		return nil, err
+		logger.Logger().Error("getResourceAllocationTotalDate error: ", err)
+		return
 	}
-	var oldMap = make(map[string]*model.OperationsLargeScreenResourceAllocationTotal)
-	for _, old := range oldList {
-		oldMap[fmt.Sprintf("%s-%s", old.Type, old.Attribute)] = old
+	var oldMap = make(map[string]int64)
+	for _, v := range oldList {
+		oldMap[fmt.Sprintf("%s-%s", v.Type, v.Attribute)] = v.Id
 	}
+	var newMap = make(map[string]int64)
 	for i, v := range newList {
-		key := fmt.Sprintf("%s-%s", v.Type, v.Attribute)
-		if _, ok := oldMap[key]; ok {
-			newList[i].Id = oldMap[key].Id
+		newMap[fmt.Sprintf("%s-%s", v.Type, v.Attribute)] = v.Id
+		newList[i].Id = oldMap[fmt.Sprintf("%s-%s", v.Type, v.Attribute)]
+	}
+	var deleteIdList []int64
+	for _, v := range oldList {
+		if _, ok := newMap[fmt.Sprintf("%s-%s", v.Type, v.Attribute)]; !ok {
+			deleteIdList = append(deleteIdList, v.Id)
 		}
 	}
-	return newList, nil
+	saveTableOperationsLargeScreenResourceAllocationTotal(db, newList, deleteIdList)
 }
 
 func getEcsResourceAllocationTotalDate(region string) ([]*model.OperationsLargeScreenResourceAllocationTotal, error) {
@@ -600,8 +607,8 @@ func getEcsResourceAllocationTotalDate(region string) ([]*model.OperationsLargeS
 		{
 			Type:       "ECS",
 			Attribute:  "memory",
-			Allocation: math.Ceil(float64(response.Data.UsedRam) / 1000 / 1000 / 1000),
-			Total:      math.Ceil(float64(response.Data.Ram) / 1000 / 1000 / 1000),
+			Allocation: float64(response.Data.UsedRam) / 1000 / 1000 / 1000,
+			Total:      float64(response.Data.Ram) / 1000 / 1000 / 1000,
 			Unit:       "GB",
 			Region:     region,
 		},
@@ -622,8 +629,8 @@ func getEbsResourceAllocationTotalDate(region string) ([]*model.OperationsLargeS
 		{
 			Type:       "EBS",
 			Attribute:  "capacity",
-			Allocation: math.Ceil(float64(response.Data.AllocatedCapacityGb) / 1000),
-			Total:      math.Ceil(float64(response.Data.TotalCapacityGb) / 1000),
+			Allocation: float64(response.Data.AllocatedCapacityGb) / 1024,
+			Total:      float64(response.Data.TotalCapacityGb) / 1024,
 			Unit:       "TB",
 			Region:     region,
 		},
@@ -720,9 +727,13 @@ func getCmqCountResourceAllocationTotalDate(region string) ([]*model.OperationsL
 }
 
 func getEipResourceAllocationTotalDate(region string) ([]*model.OperationsLargeScreenResourceAllocationTotal, error) {
+	//计算当天的23时59分59秒
+	now := util.GetNow().Unix()
+	t := now + (86400 - (now-57600)%86400)
+	timeString := strconv.FormatInt(t, 10)
 	//总带宽
-	totalPql := "sum(avg(eip_config_upstream_bandwidth{eipType='external_eip'})by(instance))"
-	totalPrometheusUrl := config.Cfg.Prometheus.Url + config.Cfg.Prometheus.Query + url.QueryEscape(totalPql)
+	totalPql := "max_over_time(sum(avg(eip_config_upstream_bandwidth{eipType='external_eip'})by(instance))[1d:1m])"
+	totalPrometheusUrl := config.Cfg.Prometheus.Url + config.Cfg.Prometheus.Query + url.QueryEscape(totalPql) + "&time=" + timeString
 	totalResponse := &form.PrometheusResponse{}
 	_, err := httputil.GetHttpClient().R().SetResult(&totalResponse).Get(totalPrometheusUrl)
 	if err != nil {
@@ -735,8 +746,8 @@ func getEipResourceAllocationTotalDate(region string) ([]*model.OperationsLargeS
 	}
 	total := changeDecimal(totalResponse.Data.Result[0].Value[1].(string)) / 1000 / 1000
 	//上行流量
-	upstreamPql := "sum(eip_upstream_bits_rate{eipType='external_eip'})"
-	upstreamPrometheusUrl := config.Cfg.Prometheus.Url + config.Cfg.Prometheus.Query + url.QueryEscape(upstreamPql)
+	upstreamPql := "max_over_time(sum(eip_upstream_bits_rate{eipType='external_eip'})[1d:1m])"
+	upstreamPrometheusUrl := config.Cfg.Prometheus.Url + config.Cfg.Prometheus.Query + url.QueryEscape(upstreamPql) + "&time=" + timeString
 	upstreamResponse := &form.PrometheusResponse{}
 	_, err = httputil.GetHttpClient().R().SetResult(&upstreamResponse).Get(upstreamPrometheusUrl)
 	if err != nil {
@@ -749,8 +760,8 @@ func getEipResourceAllocationTotalDate(region string) ([]*model.OperationsLargeS
 	}
 	upstream := changeDecimal(upstreamResponse.Data.Result[0].Value[1].(string)) / 1000 / 1000
 	//下行流量
-	downstreamPql := "sum(eip_upstream_bits_rate{eipType='external_eip'})"
-	downstreamPrometheusUrl := config.Cfg.Prometheus.Url + config.Cfg.Prometheus.Query + url.QueryEscape(downstreamPql)
+	downstreamPql := "max_over_time(sum(eip_downstream_bits_rate{eipType='external_eip'})[1d:1m])"
+	downstreamPrometheusUrl := config.Cfg.Prometheus.Url + config.Cfg.Prometheus.Query + url.QueryEscape(downstreamPql) + "&time=" + timeString
 	downstreamResponse := &form.PrometheusResponse{}
 	_, err = httputil.GetHttpClient().R().SetResult(&downstreamResponse).Get(downstreamPrometheusUrl)
 	if err != nil {
@@ -787,7 +798,12 @@ var pushRemoteDb *gorm.DB
 
 func getPushRemoteDb() (*gorm.DB, error) {
 	if pushRemoteDb == nil {
-		dsn := config.Cfg.Db.LargeScreenDbDsn
+		var remoteDatabase *model.LargeScreenRemoteDatabase
+		if err := global.DB.Where("region = ?", config.Cfg.Common.RegionName).First(&remoteDatabase).Error; err != nil {
+			logger.Logger().Error("getPushRemoteDb error: ", err)
+			return nil, err
+		}
+		dsn := fmt.Sprintf("%v:%v@(%v:%v)/%v?charset=utf8mb4&parseTime=True&loc=Local", remoteDatabase.User, remoteDatabase.Pass, remoteDatabase.Host, remoteDatabase.Port, remoteDatabase.Db)
 		logger.Logger().Infof("LargeScreenDbDsn: %v", dsn)
 		db, err := gorm.Open(mysql.New(mysql.Config{
 			DSN:                       dsn,   // DSN data source name
