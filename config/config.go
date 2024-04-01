@@ -1,7 +1,6 @@
 package config
 
 import (
-	"github.com/google/uuid"
 	"gopkg.in/yaml.v3"
 	"io/ioutil"
 	"time"
@@ -31,9 +30,12 @@ type CommonConfig struct {
 	RdbApi                 string `yaml:"rdbApi"`
 	CmqNodeApi             string `yaml:"cmqNodeApi"`
 	CmqInsApi              string `yaml:"cmqInsApi"`
-	LargeScreenAlertApi    string `yaml:"largeScreenAlertApi"`
+	CcosHawkeyeApi         string `yaml:"ccosHawkeyeApi"`
 	CocClusterBigScreenApi string `yaml:"cocClusterBigScreenApi"`
 	EbsApi                 string `yaml:"ebsApi"`
+	ResourceTagApi         string `yaml:"resourceTagApi"`
+	OssApi                 string `yaml:"ossApi"`
+	EfsApi                 string `yaml:"efsApi"`
 }
 
 type Serve struct {
@@ -108,7 +110,7 @@ func defaultAppConfig() AppConfig {
 		Common: CommonConfig{
 			Env:            "local",
 			Nk:             "",
-			RegionName:     uuid.New().String(),
+			RegionName:     "",
 			Rc:             "",
 			AsyncExportApi: "",
 		},

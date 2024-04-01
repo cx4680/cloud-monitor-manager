@@ -27,6 +27,7 @@ type InstancePageForm struct {
 	Current      int    `form:"current,default=1"`
 	PageSize     int    `form:"pageSize,default=10"`
 	Product      string `form:"product"`
+	TagKeyId     string `form:"tagKeyId"`
 }
 
 type InstanceStage interface {

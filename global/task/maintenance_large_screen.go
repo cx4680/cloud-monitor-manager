@@ -153,7 +153,7 @@ func saveTableMaintenanceLargeScreenResourceUsageTop(db *gorm.DB, newList []*mod
 
 func getLargeScreenAlert(db *gorm.DB, region string) {
 	var response *form.LargeScreenAlertResponse
-	_, err := httputil.GetHttpClient().R().SetResult(&response).Get(config.Cfg.Common.LargeScreenAlertApi)
+	_, err := httputil.GetHttpClient().R().SetResult(&response).Get(config.Cfg.Common.CcosHawkeyeApi + "/ywLargeScreen/alerts")
 	if err != nil {
 		logger.Logger().Error("getLargeScreenAlert error: ", err)
 		return

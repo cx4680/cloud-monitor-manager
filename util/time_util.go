@@ -3,10 +3,11 @@ package util
 import "time"
 
 const (
-	FullTimeFmt     = "2006-01-02 15:04:05"
-	ZoneTimeFmt     = "2006-01-02T15:04:05Z"
-	DayTimeFmt      = "2006-01-02"
-	MonthDayTimeFmt = "01-02 15:04:05"
+	FullTimeFmt       = "2006-01-02 15:04:05"
+	ZoneTimeFmt       = "2006-01-02T15:04:05Z"
+	DayTimeFmt        = "2006-01-02"
+	MonthDayTimeFmt   = "01-02 15:04:05"
+	HourMinuteTimeFmt = "15:04"
 )
 
 // GetMonthStartEnd 获取指定时间所在月的开始 结束时间

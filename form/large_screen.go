@@ -168,10 +168,183 @@ type EbsResponse struct {
 	} `json:"data"`
 }
 
+type LargeScreenResourceTagResponse struct {
+	Module *struct {
+		List  []*LargeScreenResourceTag `json:"list"`
+		Count string                    `json:"count"`
+	} `json:"module"`
+}
+
+type LargeScreenResourceTag struct {
+	TagKey   string `json:"tagKey"`
+	YagKeyId string `json:"tagKeyId"`
+}
+
+type LargeScreenResourceResponse struct {
+	Module *struct {
+		List  []*LargeScreenResource `json:"list"`
+		Count string                 `json:"count"`
+	} `json:"module"`
+}
+
+type LargeScreenResource struct {
+	ResourceId         string `json:"resourceId"`
+	ResourceInstanceId string `json:"resourceInstanceId"`
+	ResourceName       string `json:"resourceName"`
+	CloudProductCode   string `json:"cloudProductCode"`
+	ResourceTypeCode   string `json:"resourceTypeCode"`
+	StatusDesc         string `json:"statusDesc"`
+	Additional         string `json:"additional"`
+}
+
+type LargeScreenResourceStorageAdditional struct {
+	Storage   int64  `json:"storage"`
+	ObjectNum string `json:"objectNum"`
+}
+
 type LargeScreenResourceOverview struct {
-	Ecs struct{} `json:"ecs"`
-	Eip struct{} `json:"eip"`
-	Rdb struct{} `json:"rdb"`
-	Slb struct{} `json:"slb"`
-	Nat struct{} `json:"nat"`
+	Ecs struct {
+		Total  int `json:"total"`
+		Normal int `json:"normal"`
+	} `json:"ecs"`
+	Eip struct {
+		Total     int `json:"total"`
+		Bandwidth int `json:"bandwidth"`
+	} `json:"eip"`
+	Rdb struct {
+		Mysql int `json:"mysql"`
+		Dm    int `json:"dm"`
+		Pg    int `json:"pg"`
+	} `json:"rdb"`
+	Slb struct {
+		Total  int `json:"total"`
+		Normal int `json:"normal"`
+	} `json:"slb"`
+	Nat struct {
+		Total  int `json:"total"`
+		Normal int `json:"normal"`
+	} `json:"nat"`
+}
+
+type EipAdditional struct {
+	BandWidth struct {
+		BandwidthId   string `json:"bandwidthId"`
+		BandWidthSize int    `json:"BandWidthSize"`
+	} `json:"bandWidth"`
+	BindInstanceId string `json:"bindInstanceId"`
+	EipIpAddress   string `json:"eipIpAddress"`
+}
+
+type YyLargeScreen struct {
+	P1    int                   `json:"p1"`
+	P2    int                   `json:"p2"`
+	P3    int                   `json:"p3"`
+	P4    int                   `json:"p4"`
+	Trend []*YyLargeScreenTrend `json:"trend"`
+	List  []*YyLargeScreenAlert `json:"list"`
+}
+
+type YyLargeScreenTrend struct {
+	Time     string `json:"time"`
+	Alert    int    `json:"alert"`
+	Recovery int    `json:"recovery"`
+}
+
+type YyLargeScreenAlert struct {
+	AlertLevel   string `json:"alertLevel" gorm:"column:severity"`
+	ResourceId   string `json:"resourceId" gorm:"column:name"`
+	ResourceType string `json:"resourceType" gorm:"column:target_type"`
+	CreateTime   string `json:"createTime" gorm:"column:create_time"`
+}
+
+type LargeScreenEcs struct {
+	Cpu struct {
+		Value string `json:"value"`
+		Unit  string `json:"unit"`
+	} `json:"cpu"`
+	Memory struct {
+		Value string `json:"value"`
+		Unit  string `json:"unit"`
+	} `json:"memory"`
+	Disk struct {
+		Value string `json:"value"`
+		Unit  string `json:"unit"`
+	} `json:"disk"`
+}
+
+type LargeScreenEcsTop struct {
+	Name string                    `json:"name"`
+	Data []*LargeScreenEcsTopValue `json:"data"`
+}
+
+type LargeScreenEcsTopValue struct {
+	ResourceId string `json:"resourceId"`
+	Value      string `json:"value"`
+}
+
+type LargeScreenMonitorEip struct {
+	Time                string  `json:"time"`
+	UpstreamBandwidth   float64 `json:"upstreamBandwidth"`
+	DownstreamBandwidth float64 `json:"downstreamBandwidth"`
+	Upstream            float64 `json:"upstream"`
+	Downstream          float64 `json:"downstream"`
+}
+
+type LargeScreenMonitorNat struct {
+	Time                string  `json:"time"`
+	UpstreamBandwidth   float64 `json:"upstreamBandwidth"`
+	DownstreamBandwidth float64 `json:"downstreamBandwidth"`
+	Upstream            float64 `json:"upstream"`
+	Downstream          float64 `json:"downstream"`
+}
+
+type LargeScreenMonitorSlb struct {
+	Time                      string  `json:"time"`
+	AllConnectionCount        float64 `json:"allConnectionCount"`
+	AllEstConnection          float64 `json:"allEstConnection"`
+	AllNoneEstConnectionCount float64 `json:"allNoneEstConnectionCount"`
+	NewConnectionRate         float64 `json:"newConnectionRate"`
+	DropConnectionRate        float64 `json:"dropConnectionRate"`
+	RequestRate               float64 `json:"requestRate"`
+	Http2xxRate               float64 `json:"http2xxRate"`
+	Http3xxRate               float64 `json:"http3xxRate"`
+	Http4xxRate               float64 `json:"http4xxRate"`
+	Http5xxRate               float64 `json:"http5xxRate"`
+}
+
+type LargeScreenMonitor struct {
+	Name  string                     `json:"name"`
+	Code  string                     `json:"code"`
+	Unit  string                     `json:"unit"`
+	Chart []*LargeScreenMonitorChart `json:"chart"`
+}
+
+type LargeScreenMonitorChart struct {
+	ResourceId string                    `json:"resourceId"`
+	Data       []*LargeScreenMonitorData `json:"data"`
+}
+
+type LargeScreenMonitorData struct {
+	Time  string `json:"time"`
+	Value string `json:"value"`
+}
+
+type LargeScreenStorageTrend struct {
+	Time       string  `json:"time"`
+	Value      float64 `json:"value"`
+	Unit       string  `json:"unit"`
+	Conversion string  `json:"conversion"`
+}
+
+type LargeScreenStorageResponse struct {
+	Data []*struct {
+		RegionCode       string `json:"regionCode"`
+		CloudProductCode string `json:"cloudProductCode"`
+		ResourceTypeCode string `json:"resourceTypeCode"`
+		InstanceId       string `json:"instanceId"`
+		ResourceName     string `json:"resourceName"`
+		Status           string `json:"status"`
+		Size             int64  `json:"size"`
+		CreateTime       string `json:"createTime"`
+	} `json:"data"`
 }

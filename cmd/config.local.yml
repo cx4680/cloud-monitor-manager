@@ -21,19 +21,21 @@ logger:
   compress:
 
 prometheus:
-  url: http://localhost:60935/api/v1
+  url: http://localhost:60124/api/v1
   query: /query?query=
   queryRange: /query_range?query=
 
 common:
-  regionName: region1
-  rc: http://localhost:56110/rc/resource/page/outer
+  regionName: pre09
+  rc: http://localhost:49308/rc/resource/page/outer/query-by-tag
   cmdbApi: http://localhost:59642/topo/v3/noauth/find/instassociation/object/device
   cusInventoryApi: http://localhost:58011/hcmp/res/inventory/new
   rdbApi: http://localhost:57828/hcmp/rds/manage/resource
   cmqNodeApi: http://cmq-common.{{.Values.sys.region}}.{{.Values.sys.intranetDomain}}/inner/cmq/v1/node/state
   cmqInsApi: http://cmq-kafka-product-console.{{.Values.sys.region}}.{{.Values.sys.intranetDomain}}/inner/cmq/v1/kafka/instancenumdata
-  largeScreenAlertApi: http://localhost:56385/api/alert/ywLargeScreen/alerts
+  ccosHawkeyeApi: http://localhost:56385/api/alert
   cocClusterBigScreenApi: http://localhost:51156/api/ccm/bigscreen
   ebsApi: http://localhost:52057/compute/ebs/ops/v1/volumes
-
+  resourceTagApi: http://localhost:53166/inner/resource-tag
+  ossApi: http://localhost:49173/bucket/resource/information
+  efsApi: http://localhost:52244/v1.0/efs/external/share/information

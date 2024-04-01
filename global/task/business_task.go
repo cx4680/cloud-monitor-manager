@@ -25,7 +25,7 @@ type BusinessTaskImpl struct {
 	c *cron.Cron
 }
 
-var BusinessTaskList = []BusinessTaskDTO{OperationsLargeScreen(), MaintenanceLargeScreen()}
+var BusinessTaskList = []BusinessTaskDTO{OperationsLargeScreen(), MaintenanceLargeScreen(), ApplicationLargeScreen()}
 
 var podValue string
 
