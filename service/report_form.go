@@ -38,6 +38,9 @@ func (s *ReportFormService) GetMonitorData(param form.ReportFormParam) ([]*form.
 	}
 	instances := strings.Join(instanceList, "|")
 	item := dao.MonitorItem.GetMonitorItemCacheByMetricCode(param.ItemList[0])
+	if strutil.IsNotBlank(item.Unit) {
+		item.Name = fmt.Sprintf("%v（%v）", item.Name, item.Unit)
+	}
 	labels := strings.Split(item.Labels, ",")
 	pql := strings.ReplaceAll(item.Expression, constant.MetricLabel, constant.INSTANCE+"=~'"+instances+"'")
 	//获取单个指标的所有实例数据
@@ -94,7 +97,7 @@ func (s *ReportFormService) getAggregationData(param form.ReportFormParam, item 
 			for calcStyle, d := range ret {
 				dataMap[calcStyle] = d[k].Values[i]
 			}
-			if f := s.buildAggregationReportForm(v.Metric["instance"], k, item.Name, instanceMap, dataMap); f != nil {
+			if f := s.buildAggregationReportForm(v.Metric["instance"], k, item, instanceMap, dataMap); f != nil {
 				list = append(list, f)
 			}
 		}
@@ -126,7 +129,7 @@ func (s *ReportFormService) buildOriginReportForm(param form.ReportFormParam, in
 	return
 }
 
-func (s *ReportFormService) buildAggregationReportForm(instanceId, key, itemName string, instanceMap map[string]*form.InstanceForm, dataMap map[string][]interface{}) (f *form.ReportForm) {
+func (s *ReportFormService) buildAggregationReportForm(instanceId, key string, item form.MonitorItem, instanceMap map[string]*form.InstanceForm, dataMap map[string][]interface{}) (f *form.ReportForm) {
 	defer func() {
 		if e := recover(); e != nil {
 			logger.Logger().Error(e)
@@ -144,7 +147,7 @@ func (s *ReportFormService) buildAggregationReportForm(instanceId, key, itemName
 		InstanceName: instanceMap[instanceId].InstanceName,
 		InstanceId:   key,
 		Status:       instanceMap[instanceId].Status,
-		ItemName:     itemName,
+		ItemName:     item.Name,
 		Time:         time,
 		Timestamp:    timestamp,
 	}
@@ -185,34 +188,45 @@ func firstUpper(s string) string {
 }
 
 func (s *ReportFormService) Export(param form.ReportFormParam, userInfo string) error {
+	var url = config.Cfg.Common.AsyncExportApi
+	var num = len(param.InstanceList)
+	var header = map[string]string{"user-info": userInfo}
+	var count = 1
+	var countString string
 	var sheetParamList []string
 	var newParam form.ReportFormParam
-	for _, item := range param.ItemList {
-		for _, instance := range param.InstanceList {
+	for i, instance := range param.InstanceList {
+		for _, item := range param.ItemList {
 			newParam = param
 			newParam.ItemList = []string{item}
 			newParam.InstanceList = []*form.InstanceForm{instance}
 			sheetParamList = append(sheetParamList, jsonutil.ToString(newParam))
 		}
-	}
-	url := config.Cfg.Common.AsyncExportApi
-	asyncParams := []form.AsyncExportParam{
-		{
-			SheetSeq:       0,
-			SheetName:      "云资源监控",
-			SheetParamList: sheetParamList,
-		},
-	}
-	asyncRequest := form.AsyncExportRequest{
-		TemplateId: "cloud_monitor_manager",
-		Params:     asyncParams,
-	}
-	header := map[string]string{"user-info": userInfo}
-	result, err := httputil.HttpPostJson(url, asyncRequest, header)
-	logger.Logger().Infof("AsyncExport：%v", result)
-	if err != nil {
-		logger.Logger().Infof("AsyncExportError：%v", err)
-		return errors.NewBusinessError("异步导出API调用失败")
+		if (i+1)%200 == 0 || i+1 == num {
+			asyncParams := []form.AsyncExportParam{
+				{
+					SheetSeq:       0,
+					SheetName:      "云资源监控",
+					SheetParamList: sheetParamList,
+				},
+			}
+			if num > 200 {
+				countString = "-" + strconv.Itoa(count)
+			}
+			asyncRequest := form.AsyncExportRequest{
+				TemplateId: "cloud_monitor_manager",
+				Params:     asyncParams,
+				FileName:   "云上资源监控" + countString,
+			}
+			result, err := httputil.HttpPostJson(url, asyncRequest, header)
+			logger.Logger().Infof("AsyncExport：%v", result)
+			if err != nil {
+				logger.Logger().Infof("AsyncExportError：%v", err)
+				return errors.NewBusinessError("异步导出API调用失败")
+			}
+			sheetParamList = []string{}
+			count++
+		}
 	}
 	return nil
 }
@@ -296,7 +310,7 @@ func (s *ReportFormService) GetReportFormData(param form.ReportFormParam) ([]*fo
 			for calcStyle, d := range ret {
 				dataMap[calcStyle] = d[k].Values[i]
 			}
-			if f := s.buildAggregationReportForm(v.Metric["instance"], k, item.Name, instanceMap, dataMap); f != nil {
+			if f := s.buildAggregationReportForm(v.Metric["instance"], k, item, instanceMap, dataMap); f != nil {
 				list = append(list, f)
 			}
 		}
