@@ -48,6 +48,7 @@ func loadRouters() {
 	monitorChart()
 	reportForm()
 	configItemRouters()
+	LargeScreenRouters()
 }
 
 func actuatorMapping() {
@@ -134,5 +135,23 @@ func configItemRouters() {
 	group := Router.Group(pathPrefix + "configItem/")
 	{
 		group.GET("/getMonitorRange", oplog.GinTrail(NewV1OperatorInfo("GetMonitorRangeList", "获取监控查询步长", RequestTypeRead, oplog.INFO)), ctl.GetMonitorRange)
+	}
+}
+
+func LargeScreenRouters() {
+	ctl := controller.NewLargeScreenCtl()
+	group := Router.Group(pathPrefix + "inner/largeScreen")
+	{
+		group.GET("/tags", ctl.Tags)
+		group.GET("/overview", ctl.ResourceOverview)
+		group.GET("/alert", ctl.ResourceAlert)
+		group.GET("/ecs", ctl.ResourceEcs)
+		group.GET("/ecsTop", ctl.ResourceEcsTop)
+		group.GET("/eip", ctl.ResourceEip)
+		group.GET("/nat", ctl.ResourceNat)
+		group.GET("/slb", ctl.ResourceSlb)
+		group.GET("/:ProductCode", ctl.ResourceMonitorRdb)
+		group.GET("/oss", ctl.ResourceOss)
+		group.GET("/efs", ctl.ResourceEfs)
 	}
 }

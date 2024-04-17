@@ -25,6 +25,7 @@ func (s *KafkaInstanceService) ConvertRealForm(f service.InstancePageForm) inter
 		StatusList:       toStringList(f.StatusList),
 		CurrPage:         strconv.Itoa(f.Current),
 		PageSize:         strconv.Itoa(f.PageSize),
+		TagKeyId:         f.TagKeyId,
 	}
 	return param
 }

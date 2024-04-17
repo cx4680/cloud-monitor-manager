@@ -1,7 +1,6 @@
 package config
 
 import (
-	"github.com/google/uuid"
 	"gopkg.in/yaml.v3"
 	"io/ioutil"
 	"time"
@@ -20,12 +19,23 @@ type AppConfig struct {
 }
 
 type CommonConfig struct {
-	Env            string `yaml:"env"`
-	EnvType        string `yaml:"envType"`
-	Nk             string `yaml:"nk"`
-	RegionName     string `yaml:"regionName"`
-	Rc             string `yaml:"rc"`
-	AsyncExportApi string `yaml:"asyncExportApi"`
+	Env                    string `yaml:"env"`
+	EnvType                string `yaml:"envType"`
+	Nk                     string `yaml:"nk"`
+	RegionName             string `yaml:"regionName"`
+	Rc                     string `yaml:"rc"`
+	AsyncExportApi         string `yaml:"asyncExportApi"`
+	CmdbApi                string `yaml:"cmdbApi"`
+	CusInventoryApi        string `yaml:"cusInventoryApi"`
+	RdbApi                 string `yaml:"rdbApi"`
+	CmqNodeApi             string `yaml:"cmqNodeApi"`
+	CmqInsApi              string `yaml:"cmqInsApi"`
+	CcosHawkeyeApi         string `yaml:"ccosHawkeyeApi"`
+	CocClusterBigScreenApi string `yaml:"cocClusterBigScreenApi"`
+	EbsApi                 string `yaml:"ebsApi"`
+	ResourceTagApi         string `yaml:"resourceTagApi"`
+	OssApi                 string `yaml:"ossApi"`
+	EfsApi                 string `yaml:"efsApi"`
 }
 
 type Serve struct {
@@ -100,7 +110,7 @@ func defaultAppConfig() AppConfig {
 		Common: CommonConfig{
 			Env:            "local",
 			Nk:             "",
-			RegionName:     uuid.New().String(),
+			RegionName:     "",
 			Rc:             "",
 			AsyncExportApi: "",
 		},

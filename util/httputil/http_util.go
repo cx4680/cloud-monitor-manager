@@ -3,6 +3,8 @@ package httputil
 import (
 	"bytes"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/util/jsonutil"
+	"crypto/tls"
+	"github.com/go-resty/resty/v2"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -96,4 +98,19 @@ func HttpPostJson(path string, params interface{}, headers map[string]string) (s
 		return "", err
 	}
 	return string(body), nil
+}
+
+var httpClient *resty.Client
+
+func GetHttpClient() *resty.Client {
+	if httpClient == nil {
+		client := resty.New()
+		client.SetTransport(&http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true,
+			},
+		})
+		httpClient = client
+	}
+	return httpClient
 }

@@ -5,6 +5,7 @@ import (
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/global/pipeline"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/global/sys_component/sys_db"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/global/sys_component/sys_redis"
+	"code.cestc.cn/ccos-ops/cloud-monitor-manager/global/task"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/logger"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/validator/translate"
 	"code.cestc.cn/ccos-ops/cloud-monitor-manager/web"
@@ -41,6 +42,17 @@ func main() {
 	})
 
 	loader.AddStage(func(*context.Context) error {
+		bt := task.NewBusinessTaskImpl()
+		for _, v := range task.BusinessTaskList {
+			if err := bt.Add(v); err != nil {
+				return err
+			}
+		}
+		bt.Start()
+		return nil
+	})
+
+	loader.AddStage(func(*context.Context) error {
 		return web.Start(config.Cfg.Serve)
 	})
 
@@ -49,5 +61,4 @@ func main() {
 		fmt.Printf("exit error: %v", err)
 		os.Exit(1)
 	}
-
 }

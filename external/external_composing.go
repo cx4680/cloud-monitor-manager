@@ -84,6 +84,7 @@ type InstanceRequest struct {
 	TenantId         string   `json:"tenantId"`
 	PageSize         string   `json:"pageSize"`
 	CurrPage         string   `json:"currPage"`
+	TagKeyId         string   `json:"tagKeyId"`
 }
 
 type InstanceResponse struct {

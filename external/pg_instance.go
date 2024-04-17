@@ -27,6 +27,7 @@ func (s *PgInstanceService) ConvertRealForm(f service.InstancePageForm) interfac
 		StatusList:       toStringList(f.StatusList),
 		CurrPage:         strconv.Itoa(f.Current),
 		PageSize:         strconv.Itoa(f.PageSize),
+		TagKeyId:         f.TagKeyId,
 	}
 	return param
 }
