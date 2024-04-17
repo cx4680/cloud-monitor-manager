@@ -10,7 +10,6 @@ db:
   max_idle_connes: 10
   max_open_connes: 100
   username: root
-  largeScreenDbDsn: superadmin:b5fd092648@(10.253.60.49:32517)/data_platform?charset=utf8mb4&parseTime=True&loc=Local
 
 logger:
   data_log_prefix: /logs/

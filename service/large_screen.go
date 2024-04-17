@@ -486,9 +486,8 @@ func (s *LargeScreenService) ResourceStorage(tag, cloudProductCode, ResourceType
 	if err != nil {
 		return nil, err
 	}
-	resources := strings.Join(resourceList, "|")
 	var resourceStorage []*model.LargeScreenResourceStorage
-	if err = global.DB.Where("type = ? AND resource_id IN (?)", constant.CloudProductCodeOss, resources).Order("create_time ASC").Find(&resourceStorage).Error; err != nil {
+	if err = global.DB.Where("type = ? AND resource_id IN (?)", cloudProductCode, resourceList).Order("create_time ASC").Find(&resourceStorage).Error; err != nil {
 		logger.Logger().Error(err)
 		return nil, err
 	}
@@ -501,17 +500,19 @@ func (s *LargeScreenService) ResourceStorage(tag, cloudProductCode, ResourceType
 	var conversionMap = make(map[string]string)
 	var unit string
 	var min, max float64
-	if len(resourceStorage) > 0 {
-		min = float64(resourceStorage[0].Value)
-	}
 	for _, v := range resourceStorage {
 		t := util.StrToTime(util.DayTimeFmt, v.Time).Format("01-02")
 		valueMap[t] += float64(v.Value)
-		if min > float64(v.Value) {
-			min = float64(v.Value)
+	}
+	for _, v := range valueMap {
+		if v == 0 {
+			continue
 		}
-		if max < float64(v.Value) {
-			max = float64(v.Value)
+		if min > v || min == 0 {
+			min = v
+		}
+		if max < v {
+			max = v
 		}
 	}
 	if min == 0 && max == 0 {

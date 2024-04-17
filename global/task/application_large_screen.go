@@ -30,7 +30,7 @@ func ApplicationLargeScreen() BusinessTaskDTO {
 	}
 
 	return BusinessTaskDTO{
-		Cron: "0 */5 * * * ?",
+		Cron: "0 0 */1 * * ?",
 		Name: "ApplicationLargeScreen",
 		Task: task,
 	}
@@ -67,13 +67,15 @@ func getOssData(now time.Time, resources []*form.LargeScreenResource) {
 		}
 		newList = append(newList, resourceStorage)
 	}
-	if err := global.DB.Save(newList).Error; err != nil {
-		logger.Logger().Error(err)
+	if len(newList) > 0 {
+		if err := global.DB.Save(newList).Error; err != nil {
+			logger.Logger().Error(err)
+		}
 	}
 }
 
 func getEfsData(now time.Time, resources []string) {
-	var response *form.LargeScreenStorageResponse
+	var response *form.LargeScreenEfsResponse
 	param := map[string][]string{"instanceIds": resources}
 	_, err := httputil.GetHttpClient().R().SetResult(&response).SetBody(param).Post(config.Cfg.Common.EfsApi)
 	if err != nil || response == nil || response.Data == nil {
@@ -94,8 +96,8 @@ func getEfsData(now time.Time, resources []string) {
 		newMap[v.InstanceId] = nil
 		resourceStorage := oldMap[v.InstanceId]
 		if resourceStorage != nil {
-			if resourceStorage.Value < v.Size {
-				resourceStorage.Value = v.Size
+			if resourceStorage.Value < v.UsedCapacity {
+				resourceStorage.Value = v.UsedCapacity
 			}
 		} else {
 			resourceStorage = &model.LargeScreenResourceStorage{
@@ -103,7 +105,7 @@ func getEfsData(now time.Time, resources []string) {
 				Type:       constant.CloudProductCodeEfs,
 				Time:       util.TimeToStr(now, util.DayTimeFmt),
 				CreateTime: now,
-				Value:      v.Size,
+				Value:      v.UsedCapacity,
 			}
 		}
 		newList = append(newList, resourceStorage)
