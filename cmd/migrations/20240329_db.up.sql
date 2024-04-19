@@ -55,12 +55,12 @@ VALUES ('cc-wuhan-0', 'inspur', 'ceph', 'superuser', 'passw0rd', 'https://10.127
 CREATE TABLE `large_screen_resource_storage`
 (
     `resource_id` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '资源id',
+    `time`        varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '时间',
     `type`        varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '资源类型',
-    `time`        varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '时间',
     `value`       bigint                                                 NULL DEFAULT NULL COMMENT '数值',
     `create_time` datetime                                               NULL DEFAULT NULL COMMENT '创建时间',
-    PRIMARY KEY (`resource_id`) USING BTREE
+    PRIMARY KEY (`resource_id`, `time`) USING BTREE
 ) ENGINE = InnoDB
   CHARACTER SET = utf8
   COLLATE = utf8_general_ci
-  ROW_FORMAT = Dynamic;
+  ROW_FORMAT = DYNAMIC;

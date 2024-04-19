@@ -198,8 +198,8 @@ type LargeScreenResource struct {
 }
 
 type LargeScreenResourceStorageAdditional struct {
-	Storage   int64  `json:"storage"`
-	ObjectNum string `json:"objectNum"`
+	Storage   int64 `json:"storage"`
+	ObjectNum int64 `json:"objectNum"`
 }
 
 type LargeScreenResourceOverview struct {
@@ -336,7 +336,7 @@ type LargeScreenStorageTrend struct {
 	Conversion string  `json:"conversion"`
 }
 
-type LargeScreenStorageResponse struct {
+type LargeScreenEfsResponse struct {
 	Data []*struct {
 		RegionCode       string `json:"regionCode"`
 		CloudProductCode string `json:"cloudProductCode"`
@@ -344,7 +344,9 @@ type LargeScreenStorageResponse struct {
 		InstanceId       string `json:"instanceId"`
 		ResourceName     string `json:"resourceName"`
 		Status           string `json:"status"`
-		Size             int64  `json:"size"`
+		UsedCapacity     int64  `json:"usedCapacity"`
+		TotalCapacity    int64  `json:"totalCapacity"`
 		CreateTime       string `json:"createTime"`
+		UpdateTime       string `json:"updateTime"`
 	} `json:"data"`
 }
